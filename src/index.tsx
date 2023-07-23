@@ -3,6 +3,7 @@ import { render } from 'solid-js/web';
 
 import App from './components/App';
 import { ChordsProvider } from './components/ChordsProvider';
+import { ScoreviewProvider } from './components/ScoreviewProvider';
 
 const root = document.getElementById('root');
 
@@ -14,6 +15,8 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 
 render(() => 
   <ChordsProvider>
-    <App />
+    <ScoreviewProvider>
+      <App />
+    </ScoreviewProvider>
   </ChordsProvider>
   , root!);

@@ -46,10 +46,9 @@ function restorePrevScore(scoreView: ScoreView, oldScoreData: ScoreData, newScor
             scoreView.pasteNoteSets(measure.noteSets, staffIndex, measureIndex, 0);
         });
     });
-    console.log('restorePrevScore', oldScoreData, newScoreData);
 
-    if (newScoreData.staves[0].measures.length > 4) {
-        scoreView.selectMeasures(4, -1);
+    if (newScoreData.staves[0].measures.length > 2) {
+        scoreView.selectMeasures(2, -1);
         scoreView.deleteSelection();
     }
 }
@@ -80,10 +79,8 @@ const Noteflight = (props: {
             scoreView.addEventListener('selectionChange', () => { // Change made to score
 
                 scoreView.getScore().done((newScoreData) => {
-                    console.log(newScoreData)
-                    scoreView.getKeySignature().done(k => console.log(k));
 
-                    if (newScoreData.staves[0].measures.length != 4) { // Measure added || deleted
+                    if (newScoreData.staves[0].measures.length != 2) { // Measure added || deleted
                         
                         restorePrevScore(scoreView, getScoreData()!, newScoreData);
                         scoreView.getScore().done(newerScoreData => { setScoreData(newerScoreData) });
@@ -98,7 +95,9 @@ const Noteflight = (props: {
         });
     });
     return (
-        <div id={"score" + scoreCount}></div>
+        <div class="flex justify-center">
+            <div id={"score" + scoreCount}></div>
+        </div>
     );
 };
 

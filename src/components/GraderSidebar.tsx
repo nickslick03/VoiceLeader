@@ -1,0 +1,85 @@
+import { Accessor, For, createEffect, createSignal } from "solid-js"
+import GraderDropdown from "./GraderDropdown";
+import { useScoreview } from "./ScoreviewProvider";
+import { scoreToVoiceLead, VoiceLead } from "../util/converters";
+import { getChordSpellingReport } from "../util/grader";
+
+const GraderSidebar = (props: {
+    isKeyMajor: Accessor<boolean>
+}) => {
+    
+    const [isVisible, setIsVisible] = createSignal(false);
+
+    const scoreview = useScoreview()[0];
+
+    const [voiceLead, setVoicelead] = createSignal<VoiceLead>();
+
+    const [totalPoints, setTotalPoints] = createSignal(0);
+
+    const resetGrading = () => {
+        setTotalPoints(0);
+        scoreview()
+        ?.getScore()
+        .done((score) => {
+            scoreview()
+            ?.getKeySignature()
+            .done((keySignature) => {
+                setVoicelead(scoreToVoiceLead(score, keySignature))
+            });
+        });
+    };
+
+    return (
+        <>
+            <button 
+                class="fixed top-8 right-4 px-4 py-2 text-white
+                bg-green-600 shadow-md shadow-[rgba(0,0,0,.3)] hover:bg-green-400"
+                onClick={() => {
+                    resetGrading();
+                    setIsVisible(true);
+                    }}>
+                Grade
+            </button>
+            <div 
+                class="fixed top-0 left-full w-96 text-center
+                h-screen bg-gray-200 px-4 py-8 shadow-lg shadow-gray-400
+                transition-transform duration-500
+                flex flex-col gap-6
+                overflow-scroll"
+                style={{
+                    transform: `translateX(-${isVisible() ? '100' : '0'}%)`
+                }}>
+                <h2 class="text-2xl font-bold">
+                    Points: {totalPoints()} / 18
+                </h2>
+                <For each={['Chord Spelling']}>
+                    {(title) =>
+                    <div class="text-left">
+                        <GraderDropdown 
+                            voiceLead={voiceLead}
+                            graderFunction={getChordSpellingReport}
+                            isKeyMajor={props.isKeyMajor}
+                            setTotalPoints={setTotalPoints}>
+                            {title}
+                        </GraderDropdown>
+                    </div>}
+                </For>
+                <div class="sticky bottom-0 flex-1 
+                    flex justify-center gap-4 items-end">
+                    <button
+                        class="text-white px-4 py-2 bg-red-600 shadow-md shadow-[rgba(0,0,0,.3)] hover:bg-red-400"
+                        onClick={() => setIsVisible(false)}>
+                        Close
+                    </button>
+                    <button
+                        class="text-white px-4 py-2 bg-green-600 shadow-md shadow-[rgba(0,0,0,.3)] hover:bg-green-400"
+                        onClick={() => resetGrading()}>
+                        Grade Again
+                    </button>  
+                </div>
+            </div>
+        </>
+    )
+};
+
+export default GraderSidebar;

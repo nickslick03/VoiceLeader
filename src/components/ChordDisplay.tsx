@@ -1,5 +1,5 @@
 import { createMemo } from "solid-js";
-import { Chord } from "../util/grader";
+import { Chord } from "../util/converters";
 import { Switch, Match } from "solid-js/web";
 
 const NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];

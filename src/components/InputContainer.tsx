@@ -3,22 +3,15 @@ import ChordsContainer from "./ChordsContainer";
 const InputContainer = () => {
 
     return (
-        <div class="flex flex-col gap-5">
-            <div class="flex justify-center gap-5">
-                <span>Mode: </span>
-                <label>
-                    <input type="radio" name="mode" id="major" /> 
-                    &nbsp;Major
-                </label>
-                <label>
-                    <input type="radio" name="mode" id="minor" /> 
-                    &nbsp;Minor
-                </label>
+        <div class="py-3 flex flex-col gap-5">
+            <div class="text-lg text-center">
+                To change the key signature and mode, go to 
+                <br />
+                <span class="text-orange-600 font-bold">Palettes </span>
+                &gt; Measure &gt; Change Key Signature.
             </div>
-            <div>
-                <div class="text-center">
-                    Chords: 
-                </div>
+            <div class="text-center">
+                Chords:
                 <ChordsContainer />
             </div>
         </div>

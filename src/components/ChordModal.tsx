@@ -1,5 +1,5 @@
 import { Show } from "solid-js/web";
-import { Chord } from "../util/grader";
+import { Chord } from "../util/converters";
 import ChordDisplay from "./ChordDisplay";
 import { Accessor, For, Setter, createEffect } from "solid-js";
 import { useChords } from "./ChordsProvider";
@@ -42,7 +42,7 @@ const ChordModal = (props: {
     const saveChord = () => setChords(props.getCurrentIndex(), {...currentChord});
 
     return (
-        <div class={`fixed top-0 w-screen h-screen 
+        <div class={`fixed top-0 w-screen h-screen z-10
         bg-gray-700 bg-opacity-50 
         flex justify-center items-center`
             + (props.getShowModal() ? '' : ' hidden')}>
@@ -50,9 +50,7 @@ const ChordModal = (props: {
                 <h2 class="text-2xl font-bold mb-8">Change Chord</h2>
                 <div class="flex justify-center flex-wrap mb-8">
                     <div class="text-6xl pr-8 self-center">
-                        <div class="w-20">
-                            <ChordDisplay chord={currentChord} />
-                        </div>
+                        <ChordDisplay chord={currentChord} />
                     </div>
                     <div class="text-left flex flex-col gap-4">
                         <label>
@@ -142,9 +140,11 @@ const ChordModal = (props: {
                 </div>
                 <div
                     class="flex justify-center gap-4"
-                    onClick={() => {
-                        props.setShowModal(false);
-                        props.setCurrentIndex(-1);
+                    onClick={(e) => {
+                        if (e.target.nodeName === 'BUTTON') {
+                            props.setShowModal(false);
+                            props.setCurrentIndex(-1);    
+                        }
                         }}>
                     <button class="text-white px-2 py-1 bg-red-600 hover:bg-red-400">
                         Cancel

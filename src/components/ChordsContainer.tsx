@@ -18,11 +18,11 @@ const ChordsContainer = () => {
     return (
         <>
             <div class="flex justify-center gap-2 flex-wrap">
-                <For each={Array(4)}>{(_, measureIndex) =>
-                    <div class="bg-gray-500 p-2">
-                        <div class="flex justify-center gap-1">
-                            <For each={Array(4)}>
-                                {(_, quarterNoteIndex) =>
+                <For each={Array(2)}>{(_, measureIndex) =>
+                    <div class="bg-gray-400 p-2">
+                        <div class="flex justify-center gap-2">
+                            <For each={Array(measureIndex() === 0 ? 4 : 3)}>
+                                {(i, quarterNoteIndex) =>
                                 <div 
                                     class="bg-white p-2"
                                     onClick={() => showModal((measureIndex() * 4) + quarterNoteIndex())}>
@@ -30,7 +30,7 @@ const ChordsContainer = () => {
                                 </div>}
                             </For>
                         </div>
-                        <div class="text-center">
+                        <div class="text-center pt-1">
                             Measure {measureIndex() + 1}
                         </div>
                     </div>}  

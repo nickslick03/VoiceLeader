@@ -1,19 +1,27 @@
-import { createSignal } from 'solid-js';
 import Noteflight from './Noteflight';
 import InputContainer from './InputContainer';
+import GraderSidebar from './GraderSidebar';
+import { useScoreview } from './ScoreviewProvider';
+import { createSignal } from 'solid-js';
 
 const App = () => {
 
-  const [getScoreView, setScoreView] = createSignal<ScoreView>();
+  const [isKeyMajor, setIsKeyMajor] = createSignal(true);
   
   return (
     <>
-      <h1 class="text-center text-4xl font-bold my-8">
-        Voice Leader
-      </h1>
-      {/*<Noteflight setScoreView={setScoreView}/>*/}
-      <div class="w-screen h-96 bg-slate-300"></div>
+      <hgroup class="text-center my-8 flex flex-col items-center gap-4">
+        <h1 class="text-4xl font-bold pb-4 border-b-2">
+          Voice Leader
+        </h1>
+        <p>
+          Grader for AP Music Theory Question 6
+        </p>
+      </hgroup>
+      {<Noteflight setScoreView={useScoreview()[1]}/>}
+      {/*<div class="w-screen h-96 bg-slate-300"></div>*/}
       <InputContainer />
+      <GraderSidebar isKeyMajor={isKeyMajor} />
     </>
   );
 };
