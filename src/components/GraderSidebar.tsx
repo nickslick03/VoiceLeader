@@ -1,18 +1,18 @@
-import { Accessor, For, createEffect, createSignal } from "solid-js"
+import { For, createSignal } from "solid-js"
 import GraderDropdown from "./GraderDropdown";
 import { useScoreview } from "./ScoreviewProvider";
 import { scoreToVoiceLead, VoiceLead } from "../util/converters";
 import { getChordSpellingReport } from "../util/grader";
 
-const GraderSidebar = (props: {
-    isKeyMajor: Accessor<boolean>
-}) => {
+const GraderSidebar = () => {
     
     const [isVisible, setIsVisible] = createSignal(false);
 
     const scoreview = useScoreview()[0];
 
     const [voiceLead, setVoicelead] = createSignal<VoiceLead>();
+
+    const [isKeyMajor, setIsKeyMajor] = createSignal<boolean>();
 
     const [totalPoints, setTotalPoints] = createSignal(0);
 
@@ -24,7 +24,8 @@ const GraderSidebar = (props: {
             scoreview()
             ?.getKeySignature()
             .done((keySignature) => {
-                setVoicelead(scoreToVoiceLead(score, keySignature))
+                setVoicelead(scoreToVoiceLead(score, keySignature));
+                setIsKeyMajor(keySignature.mode === 'major');
             });
         });
     };
@@ -58,7 +59,7 @@ const GraderSidebar = (props: {
                         <GraderDropdown 
                             voiceLead={voiceLead}
                             graderFunction={getChordSpellingReport}
-                            isKeyMajor={props.isKeyMajor}
+                            isKeyMajor={isKeyMajor}
                             setTotalPoints={setTotalPoints}>
                             {title}
                         </GraderDropdown>

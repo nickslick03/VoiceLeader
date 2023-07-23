@@ -7,7 +7,7 @@ import { Result } from "../util/grader";
 const GraderDropdown = (props: {
     voiceLead: Accessor<VoiceLead | undefined>;
     graderFunction: (userChord: VoicePart, chord: Chord, isKeyMajor: boolean) => Result;
-    isKeyMajor: Accessor<boolean>;
+    isKeyMajor: Accessor<boolean | undefined>;
     setTotalPoints: Setter<number>;
     children: JSX.Element;
 }) => {
@@ -26,7 +26,7 @@ const GraderDropdown = (props: {
                 voiceLead.tenor[index],
                 voiceLead.alto[index],
                 voiceLead.soprano[index],
-            ], chordArr()[index], untrack(props.isKeyMajor))));
+            ], chordArr()[index], untrack(props.isKeyMajor) ?? true)));
     });
 
     createEffect(() => {
