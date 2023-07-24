@@ -2,7 +2,7 @@ import { For, createSignal } from "solid-js"
 import GraderDropdown from "./GraderDropdown";
 import { useScoreview } from "./ScoreviewProvider";
 import { scoreToVoiceLead, VoiceLead } from "../util/converters";
-import { getChordSpellingReport } from "../util/grader";
+import { getChordSpellingReport } from "../util/chordSpellingGrader";
 
 const GraderSidebar = () => {
     

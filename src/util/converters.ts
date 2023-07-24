@@ -4,7 +4,7 @@ export type ScaleDegree = {
      */
     degree: number;
     /**
-     * Any accidental, 1 being a sharp, -1 being a flat, 0 being a natural
+     * Any accidental, 1 being a half-step up, -1 being a half-step down, and 0 being nothing.
      */
     accidental: number;
 }
@@ -63,15 +63,18 @@ type ChordNames = keyof typeof chordIntervals;
  * @returns a scaleDegree object, consisting of a degree property from 1 to 7, 
  * and a accidental property representing any accidentals in number form.
  */
-export function getScaleDegree({ accidental: accidentalStr, pitch }: Note, keySignature: KeySignature): ScaleDegree {
-    const accidental = accidentals[accidentalStr ?? 'natural'];
-    const interval = (pitch + (keySignature.mode == 'minor' ? 3 : 0) + keySignature.fifths * 5 - accidental) % 12;
-    const degree = keySignature.mode == 'major'
-        ? majorIntervals.findIndex(n => n == interval) + 1
-        : minorIntervals.findIndex(n => n == interval) + 1;
+export function getScaleDegree(note: Note, keySignature: KeySignature): ScaleDegree {
+    const isKeyMajor = keySignature.mode === 'major';
+    const tonicStep = (Math.abs(keySignature.fifths) * (keySignature.fifths > 0 ? 4 : 3) + (isKeyMajor ? 0 : 5)) % 7;
+    const degree = note.step >= tonicStep
+    ? note.step - tonicStep + 1
+    : 8 + note.step - tonicStep;
+    const degreeInterval = (isKeyMajor ? majorIntervals : minorIntervals)[degree - 1];
+    const accidental = accidentals[note.accidental ?? 'natural'];
+    const interval = ((note.pitch + (keySignature.mode == 'minor' ? 3 : 0) + keySignature.fifths * 5 - accidental) % 12) + accidental;
     return {
         degree,
-        accidental,
+        accidental: interval - degreeInterval
     };
 }
 

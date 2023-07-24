@@ -30,13 +30,13 @@ test('transposeNoteToCMaj function', () => {
     cMaj.forEach((pitch, index) => {
         expect(getScaleDegree({
             pitch,
-            step: 0,
+            step: index % 7,
             alteration: 0,
             accidental: null,
             tied: false,
             noteHead: null
         }, {mode: 'major', tonic: 'C', fifths: 0})).toEqual({
-            degree: index % 7 + 1,
+            degree: (index % 7) + 1,
             accidental: 0
         })
     });
@@ -44,7 +44,7 @@ test('transposeNoteToCMaj function', () => {
     dMaj.forEach((pitch, index) => {
         expect(getScaleDegree({
             pitch,
-            step: 0,
+            step: (1 + index) % 7,
             alteration: 0,
             accidental: null,
             tied: false,
@@ -58,21 +58,7 @@ test('transposeNoteToCMaj function', () => {
     fMaj.forEach((pitch, index) => {
         expect(getScaleDegree({
             pitch,
-            step: 0,
-            alteration: 0,
-            accidental: null,
-            tied: false,
-            noteHead: null
-        }, {mode: 'major', tonic: 'F', fifths: -1})).toEqual({
-            degree: index % 7 + 1,
-            accidental: 0
-        })
-    });
-
-    fMaj.forEach((pitch, index) => {
-        expect(getScaleDegree({
-            pitch,
-            step: 0,
+            step: (3 + index) % 7,
             alteration: 0,
             accidental: null,
             tied: false,
@@ -86,7 +72,7 @@ test('transposeNoteToCMaj function', () => {
     aMin.forEach((pitch, index) => {
         expect(getScaleDegree({
             pitch,
-            step: 0,
+            step: (5 + index) % 7,
             alteration: 0,
             accidental: null,
             tied: false,
@@ -100,7 +86,7 @@ test('transposeNoteToCMaj function', () => {
     bMin.forEach((pitch, index) => {
         expect(getScaleDegree({
             pitch,
-            step: 0,
+            step: (6 + index) % 7,
             alteration: 0,
             accidental: null,
             tied: false,
@@ -111,10 +97,11 @@ test('transposeNoteToCMaj function', () => {
         })
     });
 
+    //G# in A Minor
     expect(getScaleDegree(
         {
             pitch: 68,
-            step: 0,
+            step: 4,
             alteration: 1,
             accidental: 'sharp',
             tied: false,
@@ -126,10 +113,11 @@ test('transposeNoteToCMaj function', () => {
         accidental: 1
     });
 
+    // lowest A possible
     expect(getScaleDegree(
         {
             pitch: 21,
-            step: 0,
+            step: 5,
             alteration: 0,
             accidental: 'natural',
             tied: false,

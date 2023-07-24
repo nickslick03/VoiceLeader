@@ -1,5 +1,5 @@
 import {  For, Show, createMemo, createSignal } from "solid-js";
-import { Result } from "../util/grader";
+import { Result } from "../util/chordSpellingGrader";
 import GraderMessage from "./GraderMessage";
 
 const GraderChord = (props: {

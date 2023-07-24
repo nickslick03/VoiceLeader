@@ -1,5 +1,5 @@
 import { Accessor, For, createEffect } from "solid-js";
-import { Message } from "../util/grader";
+import { Message } from "../util/chordSpellingGrader";
 
 const GraderMessage = (props: {
     message: Accessor<Message | undefined>

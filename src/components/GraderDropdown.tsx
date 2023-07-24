@@ -2,7 +2,7 @@ import { Accessor, For, JSX, Setter, Show, createEffect, createMemo, createSigna
 import { useChords } from "./ChordsProvider";
 import GraderChord from "./GraderChord";
 import { Chord, VoiceLead, VoicePart } from "../util/converters";
-import { Result } from "../util/grader";
+import { Result } from "../util/chordSpellingGrader";
 
 const GraderDropdown = (props: {
     voiceLead: Accessor<VoiceLead | undefined>;

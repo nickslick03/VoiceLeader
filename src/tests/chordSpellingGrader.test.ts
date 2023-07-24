@@ -9,7 +9,7 @@ import {
     checkChordSpelling, 
     checkEnharmonics, 
     isCorrectInversion 
-} from "../util/grader";
+} from "../util/chordSpellingGrader";
 import { realizeChord } from "../util/converters";
 
 test('checkChordSpelling', () => {

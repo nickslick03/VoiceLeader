@@ -1,4 +1,4 @@
-import { Chord, ScaleDegree, VoicePart, realizeChord, scaleDegreeToInterval } from "../util/converters";
+import { Chord, ScaleDegree, VoicePart, realizeChord, scaleDegreeToInterval } from "./converters";
 
 export type Message = {
     isCorrect: boolean;
@@ -234,7 +234,7 @@ export function getChordSpellingReport(
     const degreeList = userChord.map(({scaleDegree}) => scaleDegree);
     const pitchList = userChord.map(({note}) => note.pitch);
 
-    let points = 1;
+    let points = 1;    
 
     const messages: Message[] = [
         checkChordSpelling(chordIntervals, correctIntervals),
