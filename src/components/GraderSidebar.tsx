@@ -43,10 +43,10 @@ const GraderSidebar = () => {
             </button>
             <div 
                 class="fixed top-0 left-full w-96 text-center
-                h-screen bg-gray-200 px-4 py-8 shadow-lg shadow-gray-400
+                h-screen bg-gray-200 px-4 py-6 shadow-lg shadow-gray-400
                 transition-transform duration-500
-                flex flex-col gap-6
-                overflow-scroll"
+                [&>*]:mt-6
+                overflow-y-scroll"
                 style={{
                     transform: `translateX(-${isVisible() ? '100' : '0'}%)`
                 }}>
@@ -65,7 +65,8 @@ const GraderSidebar = () => {
                         </GraderDropdown>
                     </div>}
                 </For>
-                <div class="sticky bottom-0 flex-1 
+                <div></div>
+                <div class="sticky bottom-0
                     flex justify-center gap-4 items-end">
                     <button
                         class="text-white px-4 py-2 bg-red-600 shadow-md shadow-[rgba(0,0,0,.3)] hover:bg-red-400"

@@ -6,7 +6,6 @@ import { ChordsProvider } from './components/ChordsProvider';
 import { ScoreviewProvider } from './components/ScoreviewProvider';
 
 const root = document.getElementById('root');
-console.log(root)
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   throw new Error(

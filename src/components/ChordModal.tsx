@@ -46,7 +46,9 @@ const ChordModal = (props: {
         bg-gray-700 bg-opacity-50 
         flex justify-center items-center`
             + (props.getShowModal() ? '' : ' hidden')}>
-            <div class="text-center bg-white px-8 py-4">
+            <div 
+                class="text-center bg-white px-8 py-4 
+                shadow-md shadow-[rgba(0,0,0,.3)]">
                 <h2 class="text-2xl font-bold mb-8">Change Chord</h2>
                 <div class="flex justify-center flex-wrap mb-8">
                     <div class="text-6xl pr-8 self-center">
@@ -153,7 +155,7 @@ const ChordModal = (props: {
                         class="text-white px-2 py-1 bg-green-600 hover:bg-green-400"
                         onClick={saveChord}>
                         Save
-                        </button>
+                    </button>
                 </div>
             </div>
         </div>

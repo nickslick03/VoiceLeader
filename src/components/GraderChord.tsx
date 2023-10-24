@@ -36,7 +36,7 @@ const GraderChord = (props: {
                     + {props.result.points ?? 0} point{props.result.points === 1 ? '' : 's'}
                 </span>    
             </Show>
-            <ul class="mt-1 [&>li]:ml-4 flex flex-col gap-1">
+            <ul class="mt-2 flex flex-col gap-1">
                 <Show when={isExpanded()} fallback={
                     <GraderMessage message={getShortDisplay}/>
                 }>

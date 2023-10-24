@@ -1,4 +1,4 @@
-import { Accessor, For, createEffect } from "solid-js";
+import { Accessor, For } from "solid-js";
 import { Message } from "../util/chordSpellingGrader";
 
 const GraderMessage = (props: {
@@ -6,7 +6,7 @@ const GraderMessage = (props: {
 }) => {
     
     return (
-        <li class={"mb-1 " + (props.message()?.isCorrect ? "list-['✅']" : "list-['🚫']")}>
+        <li class={"mb-2 ml-5 pl-1 " + (props.message()?.isCorrect ? "list-['✅']" : "list-['🚫']")}>
             {props.message()?.message}
             {typeof props.message()?.list === 'object'
             ? <ul>

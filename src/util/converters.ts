@@ -55,6 +55,7 @@ const chordIntervals = {
 }
 
 type ChordNames = keyof typeof chordIntervals;
+type AccidentalNames = keyof typeof accidentals;
 
 /**
  * Converts a note to a ScaleDegree object
@@ -70,7 +71,7 @@ export function getScaleDegree(note: Note, keySignature: KeySignature): ScaleDeg
     ? note.step - tonicStep + 1
     : 8 + note.step - tonicStep;
     const degreeInterval = (isKeyMajor ? majorIntervals : minorIntervals)[degree - 1];
-    const accidental = accidentals[note.accidental ?? 'natural'];
+    const accidental = accidentals[(note.accidental ?? 'natural') as AccidentalNames];
     const interval = ((note.pitch + (keySignature.mode == 'minor' ? 3 : 0) + keySignature.fifths * 5 - accidental) % 12) + accidental;
     return {
         degree,
