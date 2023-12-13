@@ -41,6 +41,12 @@ const ChordModal = (props: {
     const setChords = useChords()[1];
     const saveChord = () => setChords(props.getCurrentIndex(), {...currentChord});
 
+    const closeModal = (isSave: boolean) => {
+        if (isSave) saveChord();
+        props.setShowModal(false);
+        props.setCurrentIndex(-1);
+    }
+
     return (
         <div class={`fixed top-0 w-screen h-screen z-10
         bg-gray-700 bg-opacity-50 
@@ -49,7 +55,7 @@ const ChordModal = (props: {
             <div 
                 class="text-center bg-white px-8 py-4 
                 shadow-md shadow-[rgba(0,0,0,.3)]">
-                <h2 class="text-2xl font-bold mb-8">Change Chord</h2>
+                <h2 class="text-2xl font-bold mb-8">Change Chord No. {props.getCurrentIndex() + 1}</h2>
                 <div class="flex justify-center flex-wrap mb-8">
                     <div class="text-6xl pr-8 self-center">
                         <ChordDisplay chord={currentChord} />
@@ -57,13 +63,16 @@ const ChordModal = (props: {
                     <div class="text-left flex flex-col gap-4">
                         <label>
                             Scale degree:
-                            <select name="scale-degree" id="scale-degree" class="ml-1">
+                            <select 
+                                name="scale-degree" 
+                                id="scale-degree" 
+                                class="ml-1"
+                                onchange={(e) => setCurrentChord('numeral', Number(e.target!.value))}>
                                 <For each={Array(7)}>
                                     {(_, i) =>
                                         <option
                                             value={i() + 1}
-                                            selected={i() + 1 === currentChord.numeral}
-                                            onclick={() => setCurrentChord('numeral', i() + 1)}>
+                                            selected={i() + 1 === currentChord.numeral}>
                                             {i() + 1}
                                         </option>}
                                 </For>
@@ -77,61 +86,62 @@ const ChordModal = (props: {
                                             type="radio"
                                             name="harmony"
                                             id={chordType}
+                                            tabIndex={0}
                                             checked={(chordType === 'Seventh') === currentChord.isSeventh}
-                                            onClick={() => changeSeventh(chordType === 'Seventh')} />
+                                            onChange={() => changeSeventh(chordType === 'Seventh')} />
                                         &nbsp;{chordType}
                                     </label>}
                             </For>
                         </div>
                         <label class="block">
                             Qualtiy:&nbsp;
-                            <select name="quality" id="quality">
+                            <select 
+                                name="quality" 
+                                id="quality"
+                                onChange={(e) => setCurrentChord('quality', e.target!.value as 'major' | 'majorMinor' | 'minor' | 'halfDiminished' | 'diminished')}>
                                 <option 
                                     value="major" 
-                                    selected={currentChord.quality === 'major'}
-                                    onClick={() => setCurrentChord('quality', 'major')}>
+                                    selected={currentChord.quality === 'major'}>
                                     Major
                                 </option>
                                 <Show when={currentChord.isSeventh}>
                                     <option 
                                         value="majorMinor" 
-                                        selected={currentChord.quality === 'majorMinor'}
-                                        onClick={() => setCurrentChord('quality', 'majorMinor')}>
+                                        selected={currentChord.quality === 'majorMinor'}>
                                         Major-Minor
                                     </option>
                                 </Show>
                                 <option 
                                     value="minor" 
-                                    selected={currentChord.quality === 'minor'}
-                                    onClick={() => setCurrentChord('quality', 'minor')}>
+                                    selected={currentChord.quality === 'minor'}>
                                     Minor
                                 </option>
                                 <Show when={currentChord.isSeventh}>
                                     <option 
                                         value="halfDiminished" 
-                                        selected={currentChord.quality === 'halfDiminished'}
-                                        onClick={() => setCurrentChord('quality', 'halfDiminished')}>
+                                        selected={currentChord.quality === 'halfDiminished'}>
                                         Half-Diminished
                                     </option>
                                 </Show>
                                 <option 
                                     value="diminished" 
-                                    selected={currentChord.quality === 'diminished'}
-                                    onClick={() => setCurrentChord('quality', 'diminished')}>
+                                    selected={currentChord.quality === 'diminished'}>
                                     Diminished
                                 </option>
                             </select>
                         </label>
                         <label>
                             Inversion:&nbsp;
-                            <select name="inversion" id="inversion">
+                            <select 
+                                name="inversion" 
+                                id="inversion"
+                                onchange={(e) => setCurrentChord('inversion', Number(e.target!.value))}>
                                 <For each={['root', '1st', '2nd', '3rd']}>
                                     {(inversionStr, i) =>
                                     <Show when={i() !== 3 || currentChord.isSeventh}>
                                         <option
                                             value={i()}
-                                            selected={currentChord.inversion === i()}
-                                            onclick={() => setCurrentChord('inversion', i())}>
+                                            selected={currentChord.inversion === i()}>
                                             {inversionStr}
                                         </option>    
                                     </Show>}
@@ -140,20 +150,15 @@ const ChordModal = (props: {
                         </label>
                     </div>
                 </div>
-                <div
-                    class="flex justify-center gap-4"
-                    onClick={(e) => {
-                        if (e.target.nodeName === 'BUTTON') {
-                            props.setShowModal(false);
-                            props.setCurrentIndex(-1);    
-                        }
-                        }}>
-                    <button class="text-white px-2 py-1 bg-red-600 hover:bg-red-400">
+                <div class="flex justify-center gap-4">
+                    <button 
+                        class="text-white px-2 py-1 bg-red-600 hover:bg-red-400"
+                        onClick={() => closeModal(false)}>
                         Cancel
                     </button>
                     <button 
                         class="text-white px-2 py-1 bg-green-600 hover:bg-green-400"
-                        onClick={saveChord}>
+                        onClick={() => closeModal(true)}>
                         Save
                     </button>
                 </div>
