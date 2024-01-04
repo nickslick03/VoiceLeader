@@ -356,7 +356,9 @@ test('realizeChord function', () => {
         numeral: 1,
         quality: 'major',
         isSeventh: false,
-        inversion: 0
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     }, true)).toEqual([0, 4, 7]);
 
     // i in minor
@@ -364,15 +366,29 @@ test('realizeChord function', () => {
         numeral: 1,
         quality: 'minor',
         isSeventh: false,
-        inversion: 0
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     }, false)).toEqual([0, 3, 7]);
+
+    // ii° in minor
+    expect(realizeChord({
+        numeral: 2,
+        quality: 'minor',
+        isSeventh: false,
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
+    }, false)).toEqual([2, 5, 9]);
 
     // ii° in minor
     expect(realizeChord({
         numeral: 2,
         quality: 'diminished',
         isSeventh: false,
-        inversion: 0
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     }, false)).toEqual([2, 5, 8]);
 
     // V7 in minor
@@ -380,7 +396,9 @@ test('realizeChord function', () => {
         numeral: 5,
         quality: 'majorMinor',
         isSeventh: true,
-        inversion: 0
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     }, false)).toEqual([7, 11, 2, 5]);
 
     // ii/°7 in minor
@@ -388,7 +406,9 @@ test('realizeChord function', () => {
         numeral: 2,
         quality: 'halfDiminished',
         isSeventh: true,
-        inversion: 0
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     }, false)).toEqual([2, 5, 8, 0]);
 
     // ii°7 in minor
@@ -396,7 +416,9 @@ test('realizeChord function', () => {
         numeral: 2,
         quality: 'diminished',
         isSeventh: true,
-        inversion: 0
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     }, false)).toEqual([2, 5, 8, 11]);
 
     // vi in major
@@ -404,7 +426,9 @@ test('realizeChord function', () => {
         numeral: 6,
         quality: 'minor',
         isSeventh: false,
-        inversion: 0
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     }, true)).toEqual([9, 0, 4]);
 
     // VI in minor
@@ -412,8 +436,30 @@ test('realizeChord function', () => {
         numeral: 6,
         quality: 'major',
         isSeventh: false,
-        inversion: 0
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     }, false)).toEqual([8, 0, 3]);
+
+    // V of V in major
+    expect(realizeChord({
+        numeral: 5,
+        quality: 'major',
+        isSeventh: false,
+        inversion: 0,
+        secondary: 5,
+        secondaryQuality: 'major'
+    }, true)).toEqual([2, 6, 9]);
+
+    // V of V in minor
+    expect(realizeChord({
+        numeral: 5,
+        quality: 'major',
+        isSeventh: false,
+        inversion: 0,
+        secondary: 5,
+        secondaryQuality: 'major'
+    }, false)).toEqual([2, 6, 9]);
 });
 
 test('scaleDegreeToInterval', () => {

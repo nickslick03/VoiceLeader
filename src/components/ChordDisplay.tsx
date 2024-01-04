@@ -1,10 +1,10 @@
-import { createMemo } from "solid-js";
+import { Show, createMemo } from "solid-js";
 import { Chord } from "../util/converters";
 import { Switch, Match } from "solid-js/web";
 
-const NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
-const TRIAD_INVERSIONS = ['', '6', '64'];
-const SEVENTH_INVERSIONS = ['7', '65', '43', '42'];
+const NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'] as const;
+const TRIAD_INVERSIONS = ['', '6', '64'] as const;
+const SEVENTH_INVERSIONS = ['7', '65', '43', '42'] as const;
 
 const ChordDisplay = (props: {
     chord: Chord;
@@ -15,7 +15,7 @@ const ChordDisplay = (props: {
     : TRIAD_INVERSIONS[props.chord.inversion ?? 0]);
 
     return (
-        <div class="pb-1">
+        <span class="pb-1">
             <span>
                 { props.chord.quality.match('major') !== null
                 ? NUMERALS[props.chord.numeral - 1]
@@ -42,7 +42,19 @@ const ChordDisplay = (props: {
                     </span>
                 </Match>
             </Switch>
-        </div>
+            <Show when={props.chord.secondary !== 1}>
+                &nbsp;/ 
+                <ChordDisplay 
+                    chord={{
+                        numeral: props.chord.secondary as number,
+                        quality: props.chord.secondaryQuality,
+                        isSeventh: false,
+                        inversion: 0,
+                        secondary: 1,
+                        secondaryQuality: 'major',
+                    }}/>
+            </Show>
+        </span>
     );
 };
 

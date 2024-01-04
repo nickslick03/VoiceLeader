@@ -17,7 +17,8 @@ const ChordModal = (props: {
         quality: 'major',
         isSeventh: false,
         inversion: 0,
-        secondary: 1
+        secondary: 1,
+        secondaryQuality: 'major',
     });
 
     createEffect(() => {
@@ -67,7 +68,7 @@ const ChordModal = (props: {
                                 name="scale-degree" 
                                 id="scale-degree" 
                                 class="ml-1"
-                                onchange={(e) => setCurrentChord('numeral', Number(e.target!.value))}>
+                                onchange={(e) => setCurrentChord('numeral', Number((e.target as HTMLSelectElement).value))}>
                                 <For each={Array(7)}>
                                     {(_, i) =>
                                         <option
@@ -98,7 +99,7 @@ const ChordModal = (props: {
                             <select 
                                 name="quality" 
                                 id="quality"
-                                onChange={(e) => setCurrentChord('quality', e.target!.value as 'major' | 'majorMinor' | 'minor' | 'halfDiminished' | 'diminished')}>
+                                onChange={(e) => setCurrentChord('quality', (e.target as HTMLSelectElement).value as 'major' | 'majorMinor' | 'minor' | 'halfDiminished' | 'diminished')}>
                                 <option 
                                     value="major" 
                                     selected={currentChord.quality === 'major'}>
@@ -135,7 +136,7 @@ const ChordModal = (props: {
                             <select 
                                 name="inversion" 
                                 id="inversion"
-                                onchange={(e) => setCurrentChord('inversion', Number(e.target!.value))}>
+                                onchange={(e) => setCurrentChord('inversion', Number((e.target as HTMLSelectElement).value))}>
                                 <For each={['root', '1st', '2nd', '3rd']}>
                                     {(inversionStr, i) =>
                                     <Show when={i() !== 3 || currentChord.isSeventh}>
@@ -148,6 +149,43 @@ const ChordModal = (props: {
                                 </For>
                             </select>
                         </label>
+                        <label>
+                            Secondary Chord:&nbsp;
+                            <select 
+                                name="secondary-chord" 
+                                id="secondary-chord" 
+                                class="ml-1"
+                                onchange={(e) => setCurrentChord('secondary', Number((e.target as HTMLSelectElement).value))}>
+                                <For each={Array(7)}>
+                                    {(_, i) =>
+                                        <option
+                                            value={i() + 1}
+                                            selected={i() + 1 === currentChord.secondary}>
+                                            {i() + 1}
+                                        </option>}
+                                </For>
+                            </select>
+                        </label>
+                        <Show when={currentChord.secondary !== 1}>
+                            <label class="block">
+                                Secondary Qualtiy:&nbsp;
+                                <select 
+                                    name="secondary-quality" 
+                                    id="secondary-quality"
+                                    onChange={(e) => setCurrentChord('secondaryQuality', (e.target as HTMLSelectElement).value as 'major' | 'minor')}>
+                                    <option 
+                                        value="major" 
+                                        selected={currentChord.quality === 'major'}>
+                                        Major
+                                    </option>
+                                    <option 
+                                        value="minor" 
+                                        selected={currentChord.quality === 'minor'}>
+                                        Minor
+                                    </option>
+                                </select>
+                            </label>
+                        </Show>
                     </div>
                 </div>
                 <div class="flex justify-center gap-4">

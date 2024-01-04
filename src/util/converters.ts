@@ -27,7 +27,8 @@ export type Chord = {
     quality: 'major' | 'majorMinor' | 'minor' | 'halfDiminished' | 'diminished';
     isSeventh: boolean;
     inversion: number;
-    secondary?: number;
+    secondary: number;
+    secondaryQuality: 'major' | 'minor';
 }
 
 export const sharpKeys = [...'CGDAEBFC'];
@@ -131,13 +132,26 @@ export function scoreToVoiceLead(score: ScoreData, keySignature: KeySignature): 
 
 /**
  * Creates a chord realization in root position.
- *        !!! TODO: add secondary function capability !!!
  * @param chord Chord object which includes the chord numeral, the chord quality, whether its a seventh, and a secondary underneath it if applicable. 
  * @param isKeyMajor true if the key of the piece is major and false if it is minor
  * @returns an array of numbers, each number representing a note in the chord where 0 is the tonic and 11 is the Major 7th.
  */
 export function realizeChord(chord: Chord, isKeyMajor: boolean): number[] {
+    if (chord.secondary > 1) return realizeChord(
+       {
+        numeral: secondaryNumeralToNumeral(chord.numeral, chord.secondary),
+        quality: chord.quality,
+        isSeventh: chord.isSeventh,
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major',
+       },
+       isKeyMajor
+    );
     const chordIntervalList = chordIntervals[chord.quality + (chord.isSeventh ? 'Seventh' : 'Triad') as ChordNames];
     const scaleIntervals = isKeyMajor ? majorIntervals : minorIntervals;
     return chordIntervalList.map(interval => (scaleIntervals[chord.numeral - 1] + interval) % 12);
 }
+
+export const secondaryNumeralToNumeral = (func: number, key: number) =>
+    ((func + key - 1) % 8) + ((func + key - 1) >= 8 ? 1 : 0);

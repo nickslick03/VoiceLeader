@@ -20,7 +20,9 @@ test('checkChordSpelling', () => {
             numeral: 1,
             quality: 'major',
             isSeventh: false,
-            inversion: 0
+            inversion: 0,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true)
     )).toEqual([]);
 
@@ -30,7 +32,9 @@ test('checkChordSpelling', () => {
             numeral: 1,
             quality: 'minor',
             isSeventh: false,
-            inversion: 0
+            inversion: 0,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true)
     )).toEqual([1]);
 
@@ -40,7 +44,9 @@ test('checkChordSpelling', () => {
             numeral: 1,
             quality: 'diminished',
             isSeventh: false,
-            inversion: 0
+            inversion: 0,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true)
     )).toEqual([1, 2]);
 });
@@ -120,7 +126,9 @@ test('ommittedNotes', () => {
             numeral: 1,
             quality: 'major',
             isSeventh: false,
-            inversion: 0
+            inversion: 0,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true),
         true
     )).toEqual([]);
@@ -132,7 +140,9 @@ test('ommittedNotes', () => {
             numeral: 1,
             quality: 'major',
             isSeventh: false,
-            inversion: 0
+            inversion: 0,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true),
         true
     )).toEqual([]);
@@ -144,7 +154,9 @@ test('ommittedNotes', () => {
             numeral: 1,
             quality: 'major',
             isSeventh: false,
-            inversion: 0
+            inversion: 0,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true),
         true
     )).toEqual([1]);
@@ -157,7 +169,9 @@ test('ommittedNotes', () => {
             numeral: 1,
             quality: 'major',
             isSeventh: false,
-            inversion: 1
+            inversion: 1,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true),
         false
     )).toEqual([]);
@@ -169,7 +183,9 @@ test('ommittedNotes', () => {
             numeral: 1,
             quality: 'major',
             isSeventh: false,
-            inversion: 1
+            inversion: 1,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true),
         false
     )).toEqual([2]);
@@ -182,7 +198,9 @@ test('doubledLeadingTone', () => {
             numeral: 5,
             quality: 'major',
             isSeventh: true,
-            inversion: 0
+            inversion: 0,
+            secondary: 1,
+            secondaryQuality: 'major'
         }, true)
     )).toEqual([]);
 

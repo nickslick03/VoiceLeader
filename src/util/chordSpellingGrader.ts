@@ -1,4 +1,4 @@
-import { Chord, ScaleDegree, VoicePart, realizeChord, scaleDegreeToInterval } from "./converters";
+import { Chord, ScaleDegree, VoicePart, realizeChord, scaleDegreeToInterval, secondaryNumeralToNumeral } from "./converters";
 
 export type Message = {
     isCorrect: boolean;
@@ -238,7 +238,12 @@ export function getChordSpellingReport(
 
     const messages: Message[] = [
         checkChordSpelling(chordIntervals, correctIntervals),
-        checkEnharmonics(degreeList, chord.numeral, chord.isSeventh),
+        checkEnharmonics(
+            degreeList, 
+            chord.secondary > 1 
+                ? secondaryNumeralToNumeral(chord.numeral, chord.secondary)
+                : chord.numeral
+            , chord.isSeventh),
         isCorrectInversion(chordIntervals[0], correctIntervals, chord.inversion),
         ommittedNotes(chordIntervals, correctIntervals, chord.inversion === 0),
         doubledLeadingTone(chordIntervals),

@@ -14,6 +14,8 @@ export function ChordsProvider(props: {
         quality: 'major',
         isSeventh: false,
         inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
     })));
 
   return (
