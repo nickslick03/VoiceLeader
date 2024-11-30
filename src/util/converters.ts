@@ -34,7 +34,8 @@ export type Chord = {
 export const sharpKeys = [...'CGDAEBFC'];
 export const flatKeys = [...sharpKeys].reverse();
 
-const majorIntervals = [0, 2, 4, 5, 7, 9, 11];
+const C_SCALE = "CDEFGAB";
+export const majorIntervals = [0, 2, 4, 5, 7, 9, 11];
 const minorIntervals = [0, 2, 3, 5, 7, 8, 10];
 const accidentals = {
     flat: -1,
@@ -155,3 +156,26 @@ export function realizeChord(chord: Chord, isKeyMajor: boolean): number[] {
 
 export const secondaryNumeralToNumeral = (func: number, key: number) =>
     ((func + key - 1) % 8) + ((func + key - 1) >= 8 ? 1 : 0);
+
+export function noteToMidiIndex(note: string) {
+
+    if (note.length < 2 || note.length > 3) 
+        throw new Error(`note ${note} has extraneous letters`);
+
+    const cScaleIndex = C_SCALE.indexOf(note[0].toUpperCase());
+    if (cScaleIndex == -1) throw new Error(`note letter ${note[0]} not valid`);
+
+    const baseIndex = majorIntervals[cScaleIndex];
+    const octave = (parseInt(note[note.length === 2 ? 1 : 2]) + 1) * 12;
+    if (isNaN(octave)) throw new Error(`note number ${note[1]} not valid`);
+
+    if (note.length === 2)
+        return octave + baseIndex;
+
+    if (note[1] === '#')
+        return octave + baseIndex + 1;
+    if (note[1] === 'b')
+        return octave + baseIndex - 1;
+    
+    throw new Error(`note symbol ${note[1]} should be sharp (#) or flat (b)`); 
+}

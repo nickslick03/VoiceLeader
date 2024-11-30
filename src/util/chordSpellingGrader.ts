@@ -13,7 +13,7 @@ export type Result = {
 
 const CHORD_DEGREES = [1, 3, 5, 7];
 
-const VOICE_PARTS = ['bass part', 'tenor part', 'alto part', 'soprano part'];
+export const VOICE_PARTS = ['bass part', 'tenor part', 'alto part', 'soprano part'];
 
 const CHORD_ORDINALS = ['1st', '3rd', '5th', '7th'];
 

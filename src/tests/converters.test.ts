@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { getScaleDegree, scoreToVoiceLead, realizeChord, scaleDegreeToInterval } from "../util/converters";
+import { getScaleDegree, scoreToVoiceLead, realizeChord, scaleDegreeToInterval, noteToMidiIndex } from "../util/converters";
 
 test('transposeNoteToCMaj function', () => {
     const cMaj = [60,62,64,65,67,69,71,72];
@@ -474,4 +474,28 @@ test('scaleDegreeToInterval', () => {
         degree: 7,
         accidental: 0 
     }, true)).toBe(11);
+});
+
+
+test('noteToMidiIndex', () => {
+
+    expect(
+        noteToMidiIndex('C3')
+    ).toBe(48);
+
+    expect(
+        noteToMidiIndex('B2')
+    ).toBe(47);
+
+    expect(
+        noteToMidiIndex('c3')
+    ).toBe(48);
+
+    expect(
+        noteToMidiIndex('C#3')
+    ).toBe(49);
+
+    expect(
+        noteToMidiIndex('Cb3')
+    ).toBe(47);
 });
