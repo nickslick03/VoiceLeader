@@ -7,6 +7,7 @@ export type Message = {
 }
 
 export type Result = {
+    title?: string;
     messages: Message[];
     points: number;
 }

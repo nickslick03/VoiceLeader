@@ -1,40 +1,13 @@
-import { Accessor, For, JSX, Setter, Show, createEffect, createMemo, createSignal, untrack } from "solid-js";
-import { useChords } from "./ChordsProvider";
+import { Accessor, For, JSX, Show, createSignal } from "solid-js";
 import GraderChord from "./GraderChord";
-import { Chord, VoiceLead, VoicePart } from "../util/converters";
 import { Result } from "../util/chordSpellingGrader";
 
 const GraderDropdown = (props: {
-    voiceLead: Accessor<VoiceLead | undefined>;
-    graderFunction: (userChord: VoicePart, chord: Chord, isKeyMajor: boolean) => Result;
-    isKeyMajor: Accessor<boolean | undefined>;
-    setTotalPoints: Setter<number>;
+    results: Accessor<Result[] | undefined>;
     children: JSX.Element;
 }) => {
 
     const [isDrop, setIsDrop] = createSignal(true);
-
-    const chordArr = createMemo(() => useChords()[0]);
-
-    const [resultsList, setResultsList] = createSignal<Result[] | undefined>();
-
-    createEffect(() => {
-        const voiceLead = props.voiceLead();
-        setResultsList(voiceLead?.bass.map((bassNote, index) => 
-            props.graderFunction([
-                bassNote,
-                voiceLead.tenor[index],
-                voiceLead.alto[index],
-                voiceLead.soprano[index],
-            ], chordArr()[index], untrack(props.isKeyMajor) ?? true)));
-    });
-
-    createEffect(() => {
-        props.setTotalPoints(points => 
-            points + (resultsList()?.reduce<number>((points, result, index) => 
-                index === 0 ? 0 :result.points + points, 0) 
-            ?? 0));
-    });
 
     return (
         <div>
@@ -51,11 +24,12 @@ const GraderDropdown = (props: {
                 </button>
             </div>
             <Show when={isDrop()}>
-                <For each={resultsList()}>
+                <For each={props.results()}>
                     {(result, i) =>
-                    <GraderChord 
-                        indicies={[i()]}
-                        result={result} />}
+                    <GraderChord
+                        title={result.title ?? `Chord ${i() + 1}`}
+                        result={result} />
+                    }
                 </For>    
             </Show>
         </div>

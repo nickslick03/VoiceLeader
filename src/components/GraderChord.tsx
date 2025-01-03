@@ -3,8 +3,8 @@ import { Result } from "../util/chordSpellingGrader";
 import GraderMessage from "./GraderMessage";
 
 const GraderChord = (props: {
-    indicies: number[];
     result: Result;
+    title: string;
 }) => {
 
     const [isExpanded, setIsExpanded] = createSignal(false);
@@ -25,17 +25,12 @@ const GraderChord = (props: {
         <div class={`${shortMessageIndex() === -1 ? 'bg-green-500' : 'bg-red-500'} bg-opacity-40
         border-black border-b-[1px] last:border-b-0
         py-2 px-2`}>
-                <For each={props.indicies}>
-                    {(index, i) =>
-                    <span>
-                        chord {index + 1}{props.indicies.length - 1 === i() ? '' : ' -> '}
-                    </span>}
-                </For>
-            <Show when={props.indicies.length !== 1 || props.indicies[0] !== 0}>
-                <span class="font-bold float-right">
-                    + {props.result.points ?? 0} point{props.result.points === 1 ? '' : 's'}
-                </span>    
-            </Show>
+            <span>
+                {props.title}
+            </span>
+            <span class="font-bold float-right">
+                + {props.result.points ?? 0} point{props.result.points === 1 ? '' : 's'}
+            </span>    
             <ul class="mt-2 flex flex-col gap-1">
                 <Show when={isExpanded()} fallback={
                     <GraderMessage message={getShortDisplay}/>

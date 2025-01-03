@@ -154,12 +154,22 @@ test('isHiddenOctave', () => {
 
 test('findIncorrectApproachToChordalSeventh', () => {
 
+    const domSeventh: Chord = {
+        numeral: 5,
+        quality: 'majorMinor',
+        isSeventh: true,
+        inversion: 0,
+        secondary: 1,
+        secondaryQuality: 'major'
+    };
+
     expect(
         findIncorrectApproachToChordalSeventh(
             [M('C2'), M('G2'), M('E3'), M('C4')],
             [M('G2'), M('B2'), M('D3'), M('F3')],
-            [MI[5], MI[7], MI[2], MI[4]],
-            MI[4]
+            [MI[5 - 1], MI[7 - 1], MI[2 - 1], MI[4 - 1]],
+            domSeventh,
+            true
         )
     ).toBe(3);
 
@@ -167,8 +177,9 @@ test('findIncorrectApproachToChordalSeventh', () => {
         findIncorrectApproachToChordalSeventh(
             [M('C2'), M('G2'), M('E3'), M('C4')],
             [M('G2'), M('B2'), M('D3'), M('F3')],
-            [MI[5],   MI[7],   MI[2],   MI[4]],
-            MI[4]
+            [MI[5 - 1], MI[7 - 1], MI[2 - 1], MI[4 - 1]],
+            domSeventh,
+            true
         )
     ).toBe(3);
 
@@ -176,8 +187,9 @@ test('findIncorrectApproachToChordalSeventh', () => {
         findIncorrectApproachToChordalSeventh(
             [M('C2'), M('G2'), M('E3'), M('C4')],
             [M('G2'), M('D3'), M('F3'), M('G4')],
-            [MI[5],   MI[2],   MI[4],   MI[5]],
-            MI[4]
+            [MI[5 - 1], MI[7 - 1], MI[2 - 1], MI[4 - 1]],
+            domSeventh,
+            true
         )
     ).toBe(-1);
 });

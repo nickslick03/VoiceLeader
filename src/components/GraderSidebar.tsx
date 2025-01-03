@@ -1,8 +1,10 @@
-import { For, createSignal } from "solid-js"
+import { For, createEffect, createMemo, createSignal, untrack } from "solid-js"
 import GraderDropdown from "./GraderDropdown";
 import { useScoreview } from "./ScoreviewProvider";
 import { scoreToVoiceLead, VoiceLead } from "../util/converters";
-import { getChordSpellingReport } from "../util/chordSpellingGrader";
+import { getChordSpellingReport, Result } from "../util/chordSpellingGrader";
+import { useChords } from "./ChordsProvider";
+import { getVoiceLeadingReports } from "../util/voiceLeadingGrader";
 
 const GraderSidebar = () => {
     
@@ -30,6 +32,41 @@ const GraderSidebar = () => {
         });
     };
 
+    const [chordSpellingResultsList, setChordSpellingResultsList] = createSignal<Result[] | undefined>();
+    const [voiceLeadingResultsList, setVoiceLeadingResultsList] = createSignal<Result[] | undefined>();
+
+    const chordArr = createMemo(() => useChords()[0]);
+
+    createEffect(() => {
+        const vc = voiceLead();
+        if (vc !== undefined) {
+            console.log(vc)
+            const spellingResults = setChordSpellingResultsList(vc.bass.map((bassNote, index) => 
+                getChordSpellingReport([
+                    bassNote,
+                    vc.tenor[index],
+                    vc.alto[index],
+                    vc.soprano[index],
+                ], chordArr()[index], untrack(isKeyMajor) ?? true)));
+
+                setVoiceLeadingResultsList(getVoiceLeadingReports(
+                [vc.bass, vc.tenor, vc.alto, vc.soprano], 
+                spellingResults.map((r, i) => r.points > 0),
+                chordArr(),
+                untrack(isKeyMajor) ?? true    
+            ))
+        }
+    });
+
+    createEffect(() => {
+        setTotalPoints(points => 
+            points + (chordSpellingResultsList()?.reduce<number>((points, result, index) => 
+                index === 0 
+                    ? 0 
+                    : result.points + points, 0) 
+            ?? 0));
+    });
+
     return (
         <>
             <button 
@@ -53,18 +90,17 @@ const GraderSidebar = () => {
                 <h2 class="text-2xl font-bold">
                     Points: {totalPoints()} / 18
                 </h2>
-                <For each={['Chord Spelling']}>
-                    {(title) =>
-                    <div class="text-left">
+
+                    <div class="text-left flex flex-col gap-10">
                         <GraderDropdown 
-                            voiceLead={voiceLead}
-                            graderFunction={getChordSpellingReport}
-                            isKeyMajor={isKeyMajor}
-                            setTotalPoints={setTotalPoints}>
-                            {title}
+                            results={chordSpellingResultsList}>
+                            Chord Spelling
                         </GraderDropdown>
-                    </div>}
-                </For>
+                        <GraderDropdown 
+                            results={voiceLeadingResultsList}>
+                            Voice Leading
+                        </GraderDropdown>
+                    </div>
                 <div></div>
                 <div class="sticky bottom-0
                     flex justify-center gap-4 items-end">
