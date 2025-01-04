@@ -1,7 +1,8 @@
 import { test, expect } from "vitest";
 import { findLeaps, getInterval, findUncharacteristicUnequalFifths, isHiddenFifth, isHiddenOctave, findIncorrectApproachToChordalSeventh, findParallelFifths, findParallelOctaves, findParallelUnisons, findOverlappingVoices, findUncharacteristicLeaps, findUnresolvedChordalSeventh, findUnresolvedOuterLeadingTone } from "../util/voiceLeadingGrader";
-import { Chord, majorIntervals, noteToMidiIndex } from "../util/converters";
-
+import { noteToMidiIndex } from "../util/converters";
+import { majorIntervals } from "../util/consts";
+import { Chord } from "../util/types";
 const M = noteToMidiIndex;
 const MI = majorIntervals;
 

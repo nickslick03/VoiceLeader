@@ -1,7 +1,8 @@
 import { For, createEffect, createMemo, createSignal, untrack } from "solid-js"
+import { VoiceLead } from "../util/types";
 import GraderDropdown from "./GraderDropdown";
 import { useScoreview } from "./ScoreviewProvider";
-import { scoreToVoiceLead, VoiceLead } from "../util/converters";
+import { scoreToVoiceLead } from "../util/converters";
 import { getChordSpellingReport, Result } from "../util/chordSpellingGrader";
 import { useChords } from "./ChordsProvider";
 import { getVoiceLeadingReports } from "../util/voiceLeadingGrader";

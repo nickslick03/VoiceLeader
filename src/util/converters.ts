@@ -1,63 +1,5 @@
-export type ScaleDegree = {
-    /**
-     * The scale degree, from 1 to 7
-     */
-    degree: number;
-    /**
-     * Any accidental, 1 being a half-step up, -1 being a half-step down, and 0 being nothing.
-     */
-    accidental: number;
-}
-
-export type VoiceLead = {
-    keySignature: KeySignature;
-    soprano: VoicePart;
-    alto: VoicePart;
-    tenor: VoicePart;
-    bass: VoicePart;
-}
-
-export type VoicePart = {
-    note: Note;
-    scaleDegree: ScaleDegree;
-}[]
-
-export type Chord = {
-    numeral: number;
-    quality: 'major' | 'majorMinor' | 'minor' | 'halfDiminished' | 'diminished';
-    isSeventh: boolean;
-    inversion: number;
-    secondary: number;
-    secondaryQuality: 'major' | 'minor';
-}
-
-export const sharpKeys = [...'CGDAEBFC'];
-export const flatKeys = [...sharpKeys].reverse();
-
-const C_SCALE = "CDEFGAB";
-export const majorIntervals = [0, 2, 4, 5, 7, 9, 11];
-const minorIntervals = [0, 2, 3, 5, 7, 8, 10];
-const accidentals = {
-    flat: -1,
-    sharp: 1,
-    doubleFlat: -2,
-    doubleSharp: 2,
-    natural: 0,
-};
-
-const chordIntervals = {
-    majorTriad: [0, 4, 7],
-    minorTriad: [0, 3, 7],
-    diminishedTriad: [0, 3, 6],
-    majorSeventh: [0, 4, 7, 11],
-    majorMinorSeventh: [0, 4, 7, 10],
-    minorSeventh: [0, 3, 7, 10],
-    halfDiminishedSeventh: [0, 3, 6, 10],
-    diminishedSeventh: [0, 3, 6, 9]
-}
-
-type ChordNames = keyof typeof chordIntervals;
-type AccidentalNames = keyof typeof accidentals;
+import { ScaleDegree, VoiceLead, VoicePart, Chord, ChordNames, AccidentalNames } from "./types";
+import { accidentals, C_SCALE, chordIntervals, majorIntervals, minorIntervals } from "./consts";
 
 /**
  * Converts a note to a ScaleDegree object
@@ -70,8 +12,8 @@ export function getScaleDegree(note: Note, keySignature: KeySignature): ScaleDeg
     const isKeyMajor = keySignature.mode === 'major';
     const tonicStep = (Math.abs(keySignature.fifths) * (keySignature.fifths > 0 ? 4 : 3) + (isKeyMajor ? 0 : 5)) % 7;
     const degree = note.step >= tonicStep
-    ? note.step - tonicStep + 1
-    : 8 + note.step - tonicStep;
+        ? note.step - tonicStep + 1
+        : 8 + note.step - tonicStep;
     const degreeInterval = (isKeyMajor ? majorIntervals : minorIntervals)[degree - 1];
     const accidental = accidentals[(note.accidental ?? 'natural') as AccidentalNames];
     const interval = ((note.pitch + (keySignature.mode == 'minor' ? 3 : 0) + keySignature.fifths * 5 - accidental) % 12) + accidental;
@@ -129,7 +71,6 @@ export function scoreToVoiceLead(score: ScoreData, keySignature: KeySignature): 
         bass: scaleDegreeList[3]
     };
 }
-
 
 /**
  * Creates a chord realization in root position.

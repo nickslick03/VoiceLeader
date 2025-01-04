@@ -1,5 +1,5 @@
 import { Show } from "solid-js/web";
-import { Chord } from "../util/converters";
+import { Chord } from "../util/types";
 import ChordDisplay from "./ChordDisplay";
 import { Accessor, For, Setter, createEffect } from "solid-js";
 import { useChords } from "./ChordsProvider";

@@ -1,4 +1,5 @@
-import { Chord, ScaleDegree, VoicePart, realizeChord, scaleDegreeToInterval, secondaryNumeralToNumeral } from "./converters";
+import { Chord, ScaleDegree, VoicePart } from "./types";
+import { realizeChord, scaleDegreeToInterval, secondaryNumeralToNumeral } from "./converters";
 
 export type Message = {
     isCorrect: boolean;

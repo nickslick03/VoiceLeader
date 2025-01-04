@@ -1,5 +1,6 @@
 import { Message, Result, VOICE_PARTS } from "./chordSpellingGrader";
-import { Chord, realizeChord, scaleDegreeToInterval, VoicePart } from "./converters";
+import { realizeChord, scaleDegreeToInterval } from "./converters";
+import { VoicePart, Chord } from "./types";
 
 const NOTE_LETTERS = [..."ABCDEFG"];
 

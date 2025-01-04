@@ -1,6 +1,6 @@
 import { JSX, createContext, useContext } from "solid-js";
 import { SetStoreFunction, createStore } from "solid-js/store";
-import type { Chord } from "../util/converters";
+import type { Chord } from "../util/types";
 
 const ChordContext = createContext();
 
