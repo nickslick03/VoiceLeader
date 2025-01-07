@@ -1,5 +1,5 @@
 import {  For, Show, createMemo, createSignal } from "solid-js";
-import { Result } from "../util/chordSpellingGrader";
+import { Result } from "../util/types";
 import GraderMessage from "./GraderMessage";
 
 const GraderChord = (props: {
@@ -9,7 +9,7 @@ const GraderChord = (props: {
 
     const [isExpanded, setIsExpanded] = createSignal(false);
 
-    const shortMessageIndex = createMemo(() => props.result.messages?.findIndex(({isCorrect}) => !isCorrect));
+    const shortMessageIndex = createMemo(() => props.result.feedbacks?.findIndex(({isCorrect}) => !isCorrect));
 
     const getShortDisplay = createMemo(() =>
         shortMessageIndex() === -1
@@ -19,7 +19,7 @@ const GraderChord = (props: {
             points: 0,
             isCorrect: true
         }
-        : props.result.messages?.[shortMessageIndex() as number]);
+        : props.result.feedbacks?.[shortMessageIndex() as number]);
 
     return (
         <div class={`${shortMessageIndex() === -1 ? 'bg-green-500' : 'bg-red-500'} bg-opacity-40
@@ -35,7 +35,7 @@ const GraderChord = (props: {
                 <Show when={isExpanded()} fallback={
                     <GraderMessage message={getShortDisplay}/>
                 }>
-                    <For each={props.result.messages}>
+                    <For each={props.result.feedbacks}>
                         {(message) =>
                         <GraderMessage message={() => message} />}
                     </For>    

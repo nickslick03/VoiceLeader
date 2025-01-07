@@ -1,8 +1,8 @@
 import { Accessor, For } from "solid-js";
-import { Message } from "../util/chordSpellingGrader";
+import { Feedback } from "../util/types";
 
 const GraderMessage = (props: {
-    message: Accessor<Message | undefined>
+    message: Accessor<Feedback | undefined>
 }) => {
     
     return (

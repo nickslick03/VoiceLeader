@@ -1,6 +1,6 @@
-import { Message, Result, VOICE_PARTS } from "./chordSpellingGrader";
+import { VOICE_PARTS } from "./consts";
 import { realizeChord, scaleDegreeToInterval } from "./converters";
-import { VoicePart, Chord } from "./types";
+import { VoicePart, Chord, Feedback, Result } from "./types";
 
 const NOTE_LETTERS = [..."ABCDEFG"];
 
@@ -519,8 +519,8 @@ export function getVoiceLeadingReports(
             findUncharacteristicLeaps(chordIndices[i - 1], scaleDegrees[i - 1], chordIndices[i], scaleDegrees[i]),
             findUnresolvedChordalSeventh(scaleDegrees[i - 1], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]]),
             findUnresolvedOuterLeadingTone(chordIntervals[i - 1], chordIndices[i - 1], scaleDegrees[i - 1], chordIndices[i], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]]),
-        ].map<Message>((value, i) => {
-            const message: Message = {isCorrect: false, message: ''};
+        ].map<Feedback>((value, i) => {
+            const message: Feedback = {isCorrect: false, message: ''};
             let pointAmount;
             switch (typeof value) {
                 case 'boolean':
@@ -573,7 +573,7 @@ export function getVoiceLeadingReports(
 
     const leapsResult: Result = {
         title: 'Number of Leaps',
-        messages: [{
+        feedbacks: [{
             isCorrect: leaps <= 5,
             message: `${leaps <= 5 ? 'Less' : 'More'} than 5 leaps in the upper voices`
         }],

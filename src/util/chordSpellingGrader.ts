@@ -1,89 +1,136 @@
-import { Chord, ScaleDegree, VoicePart } from "./types";
+import { Chord, ScaleDegree, VoicePart, Feedback, Result, Criterion } from "./types";
 import { realizeChord, scaleDegreeToInterval, secondaryNumeralToNumeral } from "./converters";
+import { CHORD_DEGREES, CHORD_ORDINALS, VOICE_PARTS } from "./consts";
 
-export type Message = {
-    isCorrect: boolean;
-    message: string;
-    list?: string[];
-}
-
-export type Result = {
-    title?: string;
-    messages: Message[];
-    points: number;
-}
-
-const CHORD_DEGREES = [1, 3, 5, 7];
-
-export const VOICE_PARTS = ['bass part', 'tenor part', 'alto part', 'soprano part'];
-
-const CHORD_ORDINALS = ['1st', '3rd', '5th', '7th'];
-
-const chordSpellingOutline = [
-    {
-       function: checkChordSpelling, 
-       points: 1,
-       correctMessage: 'The chord is spelled correctly',
-       errorMessage: 'The chord is misspelled in the:',
-       array: VOICE_PARTS
+const chordSpellingOutlineWithArrays = {
+    'checkChordSpelling': {
+        points: 1,
+        correctMessage: 'The chord is spelled correctly',
+        errorMessage: 'The chord is misspelled in the:',
+        array: VOICE_PARTS,
+        criterion: {
+            numeral: 'I',
+            letter: 'A',
+            number: [1]
+        }
     },
-    {
-        function: checkEnharmonics,
+    'checkEnharmonics': {
         points: 1,
         correctMessage: 'The chord is spelled correctly enharmonically',
         errorMessage: 'The chord is enharmonically misspelled in the:',
-        array: VOICE_PARTS
+        array: VOICE_PARTS,
+        criterion: {
+            numeral: 'I',
+            letter: 'A',
+            number: [1]
+        }
     },
-    {
-        function: isCorrectInversion,
-        points: 1,
-        correctMessage: 'The chord spelling is in the correct inversion',
-        errorMessage: 'The chord spelling is not in the correct inversion',
-        array: null
-    },
-    {
-        function: ommittedNotes,
+    'ommittedNotes': {
         points: 1,
         correctMessage: 'The chord spelling has no ommitted notes',
         errorMessage: 'The chord spelling has the following scale degrees ommitted:',
-        array: CHORD_ORDINALS
+        array: CHORD_ORDINALS,
+        criterion: {
+            numeral: 'I',
+            letter: 'A',
+            number: [2, 3]
+        }
     },
-    {
-        function: doubledLeadingTone,
-        points: .5,
+    'doubledLeadingTone': {
+        points: 0.5,
         correctMessage: 'The leading tone is not doubled',
         errorMessage: 'The leading tone is doubled in the:',
-        array: VOICE_PARTS
+        array: VOICE_PARTS,
+        criterion: {
+            numeral: 'I',
+            letter: 'C',
+            number: [1]
+        }
     },
-    {
-        function: doubledChordalSeventh,
-        points: .5,
+    'doubledChordalSeventh': {
+        points: 0.5,
         correctMessage: 'The chordal seventh is not doubled',
         errorMessage: 'The chordal seventh is doubled in the:',
-        array: VOICE_PARTS
+        array: VOICE_PARTS,
+        criterion: {
+            numeral: 'I',
+            letter: 'C',
+            number: [1]
+        }
     },
-    {
-        function: is64ChordDoubledCorrectly,
-        points: .5,
-        correctMessage: 'The fifth in the 6 4 chord is doubled',
-        errorMessage: 'The fifth in the 6 4 chord is not doubled',
-        array: null
-    },
-    {
-        function: voiceDistance,
-        points: .5,
+    'voiceDistance': {
+        points: 0.5,
         correctMessage: 'All adjacent upper voices are within an octave apart',
         errorMessage: 'These adjacent upper voices are more than an octave apart:',
-        array: ['tenor to alto', 'alto to soprano']
+        array: ['tenor to alto', 'alto to soprano'],
+        criterion: {
+            numeral: 'I',
+            letter: 'C',
+            number: [2]
+        }
     },
-    {
-        function: voiceCrossings,
-        points: .5,
+    'voiceCrossings': {
+        points: 0.5,
         correctMessage: 'There are no voice crossings',
         errorMessage: 'There are voice crossings between these voice parts',
-        array: ['bass to alto', 'bass to soprano', 'tenor to alto', 'tenor to soprano']
+        array: ['bass to alto', 'bass to soprano', 'tenor to alto', 'tenor to soprano'],
+        criterion: {
+            numeral: 'I',
+            letter: 'C',
+            number: [3]
+        }
     }
-]
+};
+
+const chordSpellingOutlineWithoutArrays = {
+    'isCorrectInversion': {
+        points: 1,
+        correctMessage: 'The chord spelling is in the correct inversion',
+        errorMessage: 'The chord spelling is not in the correct inversion',
+        criterion: {
+            numeral: 'I',
+            letter: 'A',
+            number: [1]
+        }
+    },
+    'is64ChordDoubledCorrectly': {
+        points: 0.5,
+        correctMessage: 'The fifth in the 6 4 chord is doubled',
+        errorMessage: 'The fifth in the 6 4 chord is not doubled',
+        criterion: {
+            numeral: 'I',
+            letter: 'C',
+            number: [1]
+        }
+    }
+};
+
+const feedbackTransformers = {
+    array: (name: keyof typeof chordSpellingOutlineWithArrays, wrongIndicies: number[]) => {
+        const outline = chordSpellingOutlineWithArrays[name];
+        const isCorrect = wrongIndicies.length === 0;
+        const feedback: Feedback = {
+            isCorrect,
+            pointsLost: isCorrect ? 0 : outline.points,
+            message: outline[`${isCorrect ? 'correct' : 'error'}Message`],
+            criterion: outline.criterion
+        };
+        if (!isCorrect) {
+            feedback.list = wrongIndicies.map(part => outline.array[part]);
+        }
+        return feedback;
+    },
+    boolean: (name: keyof typeof chordSpellingOutlineWithoutArrays, isCorrect: boolean) => {
+        const outline = chordSpellingOutlineWithoutArrays[name];
+        const feedback: Feedback = {
+            isCorrect,
+            pointsLost: isCorrect ? 0 : outline.points,
+            message: outline[`${isCorrect ? 'correct' : 'error'}Message`],
+            criterion: outline.criterion
+        };
+        return feedback;
+    }
+};
 
 /**
  * Checks if the intervals of the chord are correct.
@@ -238,41 +285,39 @@ export function getChordSpellingReport(
 
     let points = 1;    
 
-    const messages: Message[] = [
-        checkChordSpelling(chordIntervals, correctIntervals),
-        checkEnharmonics(
+    const messages: Feedback[] = Object.entries({
+        'checkChordSpelling': checkChordSpelling(chordIntervals, correctIntervals),
+        'checkEnharmonics': checkEnharmonics(
             degreeList, 
             chord.secondary > 1 
                 ? secondaryNumeralToNumeral(chord.numeral, chord.secondary)
                 : chord.numeral
             , chord.isSeventh),
-        isCorrectInversion(chordIntervals[0], correctIntervals, chord.inversion),
-        ommittedNotes(chordIntervals, correctIntervals, chord.inversion === 0),
-        doubledLeadingTone(chordIntervals),
-        chord.isSeventh ? doubledChordalSeventh(chordIntervals, correctIntervals[3]) : [],
-        chord.inversion === 2 && !chord.isSeventh
+        'isCorrectInversion': isCorrectInversion(chordIntervals[0], correctIntervals, chord.inversion),
+        'ommittedNotes': ommittedNotes(chordIntervals, correctIntervals, chord.inversion === 0),
+        'doubledLeadingTone': doubledLeadingTone(chordIntervals),
+        'doubledChordalSeventh': chord.isSeventh 
+            ? doubledChordalSeventh(chordIntervals, correctIntervals[3]) 
+            : [],
+        'is64ChordDoubledCorrectly': chord.inversion === 2 && !chord.isSeventh
             ? is64ChordDoubledCorrectly(chordIntervals, correctIntervals[2])
             : true,
-        voiceDistance(pitchList[1], pitchList[2], pitchList[3]),
-        voiceCrossings(pitchList[0], pitchList[1], pitchList[2], pitchList[3]),
-    ].map<Message>((val, index) => {
-        const isCorrect = typeof val === 'object'
-        ? val.length === 0
-        : val;
-        if (!isCorrect) points -= chordSpellingOutline[index].points;
-        const message = chordSpellingOutline[index][`${isCorrect ? 'correct' : 'error'}Message`];
-        const list = !isCorrect && typeof val === 'object'
-        ? val.map((num) => chordSpellingOutline[index].array![num])
-        : undefined;
-        return {
-            isCorrect,
-            message,
-            list
-        }
-    });
+        'voiceDistance': voiceDistance(pitchList[1], pitchList[2], pitchList[3]),
+        'voiceCrossings': voiceCrossings(pitchList[0], pitchList[1], pitchList[2], pitchList[3]),
+        })
+        .map<Feedback>(([key, val]) => {
+            if (key in chordSpellingOutlineWithArrays) {
+                return feedbackTransformers.array(
+                    key as keyof typeof chordSpellingOutlineWithArrays, 
+                    val as number[]);
+            }
+            return feedbackTransformers.boolean(
+                key as keyof typeof chordSpellingOutlineWithoutArrays, 
+                val as boolean);
+        });
 
     return {
-        messages,
+        feedbacks: messages,
         points: points < 0 ? 0 : points
     };
 }

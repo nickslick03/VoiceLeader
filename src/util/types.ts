@@ -42,3 +42,29 @@ export type Chord = {
 
 export type ChordNames = keyof typeof chordIntervals;
 export type AccidentalNames = keyof typeof accidentals;
+
+/** A unit of feedback based on a criterion in the AP music theory scoring guidline. */
+export type Feedback = {
+    /** The number of points lost based on the criterion. If `isCorrect` is `true`, should be `0`. */
+    pointsLost: number;
+    isCorrect: boolean;
+    message: string;
+    list?: string[];
+    criterion: Criterion
+}
+
+/** References a criterion on the AP music theory grading scoring guidelines 2021:
+ * https://apcentral.collegeboard.org/media/pdf/ap21-sg-music-theory.pdf
+ */
+export type Criterion = {
+    numeral: string;
+    letter: string;
+    number?: number[];
+}
+
+/** An object with a list of feedback objects. Can be for one chord or a group of chords. */
+export type Result = {
+    title?: string;
+    feedbacks: Feedback[];
+    points: number;
+}

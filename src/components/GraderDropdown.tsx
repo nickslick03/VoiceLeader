@@ -1,6 +1,6 @@
 import { Accessor, For, JSX, Show, createSignal } from "solid-js";
 import GraderChord from "./GraderChord";
-import { Result } from "../util/chordSpellingGrader";
+import { Result } from "../util/types";
 
 const GraderDropdown = (props: {
     results: Accessor<Result[] | undefined>;

@@ -26,3 +26,7 @@ export const chordIntervals = {
     halfDiminishedSeventh: [0, 3, 6, 10],
     diminishedSeventh: [0, 3, 6, 9]
 } as const;
+
+export const CHORD_DEGREES = [1, 3, 5, 7];
+export const VOICE_PARTS = ['bass part', 'tenor part', 'alto part', 'soprano part'];
+export const CHORD_ORDINALS = ['1st', '3rd', '5th', '7th'];
