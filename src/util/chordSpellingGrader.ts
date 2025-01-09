@@ -1,4 +1,4 @@
-import { Chord, ScaleDegree, VoicePart, Feedback, Result, Criterion } from "./types";
+import { Chord, ScaleDegree, VoicePart, Feedback, Result, Criterion, noteInterval, MIDIPitch, VoiceLead } from "./types";
 import { realizeChord, scaleDegreeToInterval, secondaryNumeralToNumeral } from "./converters";
 import { CHORD_DEGREES, CHORD_ORDINALS, VOICE_PARTS } from "./consts";
 
@@ -95,7 +95,7 @@ const chordSpellingOutlineWithoutArrays = {
     },
     'is64ChordDoubledCorrectly': {
         points: 0.5,
-        correctMessage: 'The fifth in the 6 4 chord is doubled',
+        correctMessage: 'The fifth in the 6 4 chord (if any) is doubled',
         errorMessage: 'The fifth in the 6 4 chord is not doubled',
         criterion: {
             numeral: 'I',
@@ -136,9 +136,9 @@ const feedbackTransformers = {
  * Checks if the intervals of the chord are correct.
  * @param chordIntervals the intervals of the chord the user entered
  * @param correctIntervals the intervals of the actual chord
- * @returns an array of the indicies of the chordIntervals array that are wrong notes. If empty, the user did not enter any wrong notes.
+ * @returns an array of the indicies of the chordIntervals array that are wrong notes (i.e. the voice part where the note was wrong). If empty, the user did not enter any wrong notes.
  */
-export function checkChordSpelling(chordIntervals: number[], correctIntervals: number[]) {
+export function checkChordSpelling(chordIntervals: noteInterval[], correctIntervals: noteInterval[]) {
     return chordIntervals.reduce<number[]>((arr, interval, index) => {
         if (!correctIntervals.includes(interval)) arr.push(index);
         return arr;
@@ -152,7 +152,7 @@ export function checkChordSpelling(chordIntervals: number[], correctIntervals: n
  * @param isSeventh Whether the chord is a seventh chord
  * @returns an array of the indicies of the degreeList array that are enharmonically incorrect. If empty, all the notes are enharmonically correct.
  */
-export function checkEnharmonics(degreeList: ScaleDegree[], chordNumeral: number, isSeventh: boolean) {
+export function checkEnharmonics(degreeList: ScaleDegree[], chordNumeral: ScaleDegree['degree'], isSeventh: boolean) {
     return degreeList.reduce<number[]>((arr, degree, index) => {
         const chordDegree = ((degree.degree + (7 - chordNumeral)) % 7) + 1;
         if (
@@ -171,7 +171,7 @@ export function checkEnharmonics(degreeList: ScaleDegree[], chordNumeral: number
  * @param inversion the inversion of the chord
  * @returns A boolean indicating whether the bass note is the correct inversion.
  */
-export function isCorrectInversion(bassInterval: number, correctIntervalList: number[], inversion: number) {
+export function isCorrectInversion(bassInterval: noteInterval, correctIntervalList: number[], inversion: number) {
     return bassInterval == correctIntervalList[inversion];
 }
 
@@ -184,7 +184,7 @@ export function isCorrectInversion(bassInterval: number, correctIntervalList: nu
  * @returns an array of the index of the chord degree the user ommitted. If empty, the user did not omit any notes.
  */
 export function ommittedNotes(
-    chordIntervals: number[], completeIntervals: number[], isRootPosition: boolean): number[] {
+    chordIntervals: noteInterval[], completeIntervals: noteInterval[], isRootPosition: boolean): number[] {
     return completeIntervals.reduce<number[]>((arr, interval, index) => {
         const isIncluded = chordIntervals.includes(interval);
         const isFifth = interval == completeIntervals[2];
@@ -201,7 +201,7 @@ export function ommittedNotes(
  * @param searchInterval the interval to search for doubling
  * @returns false if all the notes are different or a list of indicies of the doubleInterval if doubled
  */
-function doubledInterval(chordIntervals: number[], searchInterval: number) {
+function doubledInterval(chordIntervals: noteInterval[], searchInterval: noteInterval) {
     const doubledList =  chordIntervals
         .map((interval, index) => interval === searchInterval ? index : -1)
         .filter(index => index > -1);
@@ -213,17 +213,17 @@ function doubledInterval(chordIntervals: number[], searchInterval: number) {
  * @param chordIntervals the chord intervals of the notes the user entered, from bass to soprano
  * @returns an array of indicies of the doubled leading tones. If empty, there are no doubled leading tones.
  */
-export function doubledLeadingTone(chordIntervals: number[]) {
+export function doubledLeadingTone(chordIntervals: noteInterval[]) {
     return doubledInterval(chordIntervals, 11);
 }
 
 /**
  * Checks if the chordal seventh is doubled in a chord.
  * @param chordIntervals the chord intervals of the notes the user entered, from bass to soprano
- * @param seventh the chordal seventh
+ * @param seventh the interval of the chordal seventh
  * @returns an array of indicies of the doubled chordal sevenths. If empty, there are no doubled chordal sevenths.
  */
-export function doubledChordalSeventh(chordIntervals: number[], seventh: number) {
+export function doubledChordalSeventh(chordIntervals: noteInterval[], seventh: noteInterval) {
     return doubledInterval(chordIntervals, seventh);
 }
 
@@ -233,7 +233,7 @@ export function doubledChordalSeventh(chordIntervals: number[], seventh: number)
  * @param fifth the fifth of the chord
  * @returns true if the fifth isn't doubled, false if the fifth is doubled.
  */
-export function is64ChordDoubledCorrectly(chordIntervals: number[], fifth: number) {
+export function is64ChordDoubledCorrectly(chordIntervals: noteInterval[], fifth: noteInterval) {
     return chordIntervals.indexOf(fifth) !== chordIntervals.lastIndexOf(fifth);
 }
 
@@ -244,7 +244,7 @@ export function is64ChordDoubledCorrectly(chordIntervals: number[], fifth: numbe
  * @param sopranoPitch the MIDI index of the soprano pitch
  * @returns an array of indices representing the voices in which the distance is greater than an octave. 0 is tenor to alto, and 1 is alto to soprano. Empty if there are no upper adjacant voices with a distance greater than an octave.
  */
-export function voiceDistance(tenorPitch: number, altoPitch: number, sopranoPitch: number) {
+export function voiceDistance(tenorPitch: MIDIPitch, altoPitch: MIDIPitch, sopranoPitch: MIDIPitch) {
     return [
         altoPitch - tenorPitch > 12 ? 0 : -1,
         sopranoPitch - altoPitch > 12 ? 1 : -1
@@ -259,7 +259,7 @@ export function voiceDistance(tenorPitch: number, altoPitch: number, sopranoPitc
  * @param sopranoPitch the MIDI index of the soprano pitch
  * @returns an array of indicies where each index correlates with a voice crossing. 0 is bass to alto, 1 is bass to soprano, 2 is tenor to alto, 3 is tenor to soprano. Empty if there are no voice crossings.
  */
-export function voiceCrossings(bassPitch: number, tenorPitch: number, altoPitch: number, sopranoPitch: number) {
+export function voiceCrossings(bassPitch: MIDIPitch, tenorPitch: MIDIPitch, altoPitch: MIDIPitch, sopranoPitch: MIDIPitch) {
     return [
         bassPitch > altoPitch ? 0 : -1,
         bassPitch > sopranoPitch ? 1 : -1,
@@ -275,7 +275,7 @@ export function voiceCrossings(bassPitch: number, tenorPitch: number, altoPitch:
  * @param isKeyMajor A boolean representing whether the key is major. If false, the key is minor
  * @returns A result object.
  */
-export function getChordSpellingReport(
+function getChordSpellingResult(
     userChord: VoicePart, chord: Chord, isKeyMajor: boolean): Result {
 
     const chordIntervals = userChord.map(({scaleDegree}) => scaleDegreeToInterval(scaleDegree, isKeyMajor));
@@ -306,18 +306,43 @@ export function getChordSpellingReport(
         'voiceCrossings': voiceCrossings(pitchList[0], pitchList[1], pitchList[2], pitchList[3]),
         })
         .map<Feedback>(([key, val]) => {
+            let fb: Feedback;
             if (key in chordSpellingOutlineWithArrays) {
-                return feedbackTransformers.array(
+                fb =  feedbackTransformers.array(
                     key as keyof typeof chordSpellingOutlineWithArrays, 
                     val as number[]);
+            } else {
+                fb = feedbackTransformers.boolean(
+                    key as keyof typeof chordSpellingOutlineWithoutArrays, 
+                    val as boolean);
             }
-            return feedbackTransformers.boolean(
-                key as keyof typeof chordSpellingOutlineWithoutArrays, 
-                val as boolean);
+            points -= fb.pointsLost;
+            return fb;
         });
 
     return {
         feedbacks: messages,
         points: points < 0 ? 0 : points
     };
+}
+
+/**
+ * 
+ * @param voiceLead 
+ * @param chords 
+ * @returns 
+ */
+export function getChordSpellingResults(
+    voiceLead: VoiceLead, chords: Chord[]): Result[] {
+    const isKeyMajor = voiceLead.keySignature.mode === 'major';
+    return voiceLead.bass.map((bass, i) => getChordSpellingResult(
+        [
+            bass,
+            voiceLead.tenor[i],
+            voiceLead.alto[i],
+            voiceLead.soprano[i]
+        ],
+        chords[i],
+        isKeyMajor
+    ));
 }

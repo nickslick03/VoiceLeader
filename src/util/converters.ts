@@ -1,4 +1,4 @@
-import { ScaleDegree, VoiceLead, VoicePart, Chord, ChordNames, AccidentalNames } from "./types";
+import { ScaleDegree, VoiceLead, VoicePart, Chord, ChordNames, AccidentalNames, noteInterval } from "./types";
 import { accidentals, C_SCALE, chordIntervals, majorIntervals, minorIntervals } from "./consts";
 
 /**
@@ -29,7 +29,7 @@ export function getScaleDegree(note: Note, keySignature: KeySignature): ScaleDeg
  * @param isKeyMajor a boolean that indicates whether the key signature is major. If false, the key is minor.
  * @returns a number representing a note where 0 is the tonic and 11 is the Major 7th
  */
-export function scaleDegreeToInterval(scaleDegree: ScaleDegree, isKeyMajor: boolean) {
+export function scaleDegreeToInterval(scaleDegree: ScaleDegree, isKeyMajor: boolean): noteInterval {
     const scaleIntervals = isKeyMajor ? majorIntervals : minorIntervals;
     return (scaleIntervals[scaleDegree.degree - 1] + scaleDegree.accidental) % 12;
 }
@@ -78,7 +78,7 @@ export function scoreToVoiceLead(score: ScoreData, keySignature: KeySignature): 
  * @param isKeyMajor true if the key of the piece is major and false if it is minor
  * @returns an array of numbers, each number representing a note in the chord where 0 is the tonic and 11 is the Major 7th.
  */
-export function realizeChord(chord: Chord, isKeyMajor: boolean): number[] {
+export function realizeChord(chord: Chord, isKeyMajor: boolean): noteInterval[] {
     if (chord.secondary > 1) return realizeChord(
        {
         numeral: secondaryNumeralToNumeral(chord.numeral, chord.secondary),

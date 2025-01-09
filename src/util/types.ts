@@ -68,3 +68,9 @@ export type Result = {
     feedbacks: Feedback[];
     points: number;
 }
+
+/** A number from 0 to 11 representing a note's number of half steps above the tonic. */
+export type noteInterval = number;
+
+/** The MIDI index of a pitch. */
+export type MIDIPitch = number;

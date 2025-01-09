@@ -3,7 +3,7 @@ import { VoiceLead, Result } from "../util/types";
 import GraderDropdown from "./GraderDropdown";
 import { useScoreview } from "./ScoreviewProvider";
 import { scoreToVoiceLead } from "../util/converters";
-import { getChordSpellingReport } from "../util/chordSpellingGrader";
+import {  getChordSpellingResults } from "../util/chordSpellingGrader";
 import { useChords } from "./ChordsProvider";
 import { getVoiceLeadingReports } from "../util/voiceLeadingGrader";
 
@@ -42,13 +42,9 @@ const GraderSidebar = () => {
         const vc = voiceLead();
         if (vc !== undefined) {
             console.log(vc)
-            const spellingResults = setChordSpellingResultsList(vc.bass.map((bassNote, index) => 
-                getChordSpellingReport([
-                    bassNote,
-                    vc.tenor[index],
-                    vc.alto[index],
-                    vc.soprano[index],
-                ], chordArr()[index], untrack(isKeyMajor) ?? true)));
+            const spellingResults = setChordSpellingResultsList(
+                getChordSpellingResults(vc, chordArr())
+            );
 
                 setVoiceLeadingResultsList(getVoiceLeadingReports(
                 [vc.bass, vc.tenor, vc.alto, vc.soprano], 
