@@ -4,6 +4,10 @@ export const flatKeys = [...sharpKeys].reverse();
 
 export const C_SCALE = "CDEFGAB";
 
+export const NOTE_LETTERS = [..."ABCDEFG"];
+
+export const INTERVALS = ['0', 'm2', 'M2', 'm3', 'M3', 'P4', 'd5', 'P5', 'm6', 'M6', 'm7', 'M7'] as const; 
+
 export const majorIntervals = [0, 2, 4, 5, 7, 9, 11] as const;
 
 export const minorIntervals = [0, 2, 3, 5, 7, 8, 10] as const; 

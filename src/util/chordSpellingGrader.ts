@@ -1,8 +1,9 @@
-import { Chord, ScaleDegree, VoicePart, Feedback, Result, Criterion, noteInterval, MIDIPitch, VoiceLead } from "./types";
+import { Chord, ScaleDegree, VoicePart, Feedback, Result, Criterion, noteInterval, MIDIPitch, VoiceLead, Outline } from "./types";
 import { realizeChord, scaleDegreeToInterval, secondaryNumeralToNumeral } from "./converters";
 import { CHORD_DEGREES, CHORD_ORDINALS, VOICE_PARTS } from "./consts";
+import { feedbackTransformers } from "./feedbackTransformers";
 
-const chordSpellingOutlineWithArrays = {
+const chordSpellingOutlinesWithArrays: Record<string, Outline<'Array'>> = {
     'checkChordSpelling': {
         points: 1,
         correctMessage: 'The chord is spelled correctly',
@@ -82,7 +83,7 @@ const chordSpellingOutlineWithArrays = {
     }
 };
 
-const chordSpellingOutlineWithoutArrays = {
+const chordSpellingOutlinesWithBooleans: Record<string, Outline> = {
     'isCorrectInversion': {
         points: 1,
         correctMessage: 'The chord spelling is in the correct inversion',
@@ -102,33 +103,6 @@ const chordSpellingOutlineWithoutArrays = {
             letter: 'C',
             number: [1]
         }
-    }
-};
-
-const feedbackTransformers = {
-    array: (name: keyof typeof chordSpellingOutlineWithArrays, wrongIndicies: number[]) => {
-        const outline = chordSpellingOutlineWithArrays[name];
-        const isCorrect = wrongIndicies.length === 0;
-        const feedback: Feedback = {
-            isCorrect,
-            pointsLost: isCorrect ? 0 : outline.points,
-            message: outline[`${isCorrect ? 'correct' : 'error'}Message`],
-            criterion: outline.criterion
-        };
-        if (!isCorrect) {
-            feedback.list = wrongIndicies.map(part => outline.array[part]);
-        }
-        return feedback;
-    },
-    boolean: (name: keyof typeof chordSpellingOutlineWithoutArrays, isCorrect: boolean) => {
-        const outline = chordSpellingOutlineWithoutArrays[name];
-        const feedback: Feedback = {
-            isCorrect,
-            pointsLost: isCorrect ? 0 : outline.points,
-            message: outline[`${isCorrect ? 'correct' : 'error'}Message`],
-            criterion: outline.criterion
-        };
-        return feedback;
     }
 };
 
@@ -307,13 +281,15 @@ function getChordSpellingResult(
         })
         .map<Feedback>(([key, val]) => {
             let fb: Feedback;
-            if (key in chordSpellingOutlineWithArrays) {
-                fb =  feedbackTransformers.array(
-                    key as keyof typeof chordSpellingOutlineWithArrays, 
+            if (key in chordSpellingOutlinesWithArrays) {
+                fb = feedbackTransformers.array(
+                    chordSpellingOutlinesWithArrays,
+                    key, 
                     val as number[]);
             } else {
                 fb = feedbackTransformers.boolean(
-                    key as keyof typeof chordSpellingOutlineWithoutArrays, 
+                    chordSpellingOutlinesWithBooleans,
+                    key, 
                     val as boolean);
             }
             points -= fb.pointsLost;

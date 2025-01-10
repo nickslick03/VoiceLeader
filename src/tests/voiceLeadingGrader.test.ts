@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
 import { findLeaps, getInterval, findUncharacteristicUnequalFifths, isHiddenFifth, isHiddenOctave, findIncorrectApproachToChordalSeventh, findParallelFifths, findParallelOctaves, findParallelUnisons, findOverlappingVoices, findUncharacteristicLeaps, findUnresolvedChordalSeventh, findUnresolvedOuterLeadingTone } from "../util/voiceLeadingGrader";
 import { noteToMidiIndex } from "../util/converters";
-import { majorIntervals } from "../util/consts";
+import { majorIntervals, VOICE_PARTS } from "../util/consts";
 import { Chord } from "../util/types";
 const M = noteToMidiIndex;
 const MI = majorIntervals;
@@ -172,7 +172,7 @@ test('findIncorrectApproachToChordalSeventh', () => {
             domSeventh,
             true
         )
-    ).toBe(3);
+    ).toEqual([3]);
 
     expect(
         findIncorrectApproachToChordalSeventh(
@@ -182,7 +182,7 @@ test('findIncorrectApproachToChordalSeventh', () => {
             domSeventh,
             true
         )
-    ).toBe(3);
+    ).toEqual([3]);
 
     expect(
         findIncorrectApproachToChordalSeventh(
@@ -192,7 +192,7 @@ test('findIncorrectApproachToChordalSeventh', () => {
             domSeventh,
             true
         )
-    ).toBe(-1);
+    ).toEqual([]);
 });
 
 test('findParallelFifths', () => {
@@ -322,9 +322,9 @@ test('findUncharacteristicLeaps', () => {
             [2, 6, 2, 2],
         )
     ).toEqual([
-        [1, 'tritone'],
-        [2, 'more than a fifth'],
-        [3, 'augmented second']
+        [1, 1],
+        [2, 2],
+        [3, 0]
     ])
 });
 
@@ -379,33 +379,24 @@ test('findUnresolvedChordalSeventh', () => {
             [5, 4, 5, 7],
             [1, 3, 5, 1],
             [null, domSeventh, tonMaj]
-        )
-    ).toEqual({
-        isCorrect: true,
-        message: 'Chordal seventh in the tenor part is resolved correctly'
-    });
+        )?.message
+    ).toEqual('Chordal seventh in the tenor part is resolved correctly');
 
     expect(
         findUnresolvedChordalSeventh(
             [5, 4, 5, 7],
             [1, 5, 3, 1],
             [null, domSeventh, tonMaj]
-        )
-    ).toEqual({
-        isCorrect: false,
-        message: 'Chordal seventh in the tenor part is not resolved correctly'
-    });
+        )?.message
+    ).toEqual('Chordal seventh in the tenor part is not resolved correctly');
 
     expect(
         findUnresolvedChordalSeventh(
             [2, 5, 4, 7],
             [3, 5, 5, 1],
             [tonMin, domSecondInversionSeventh, tonFirstInversionMin]
-        )
-    ).toEqual({
-        isCorrect: true,
-        message: 'Chordal seventh in the alto part is resolved correctly'
-    });
+        )?.message
+    ).toEqual('Chordal seventh in the alto part is resolved correctly');
 });
 
 test('findUnresolvedOuterLeadingTone', () => {
@@ -445,10 +436,10 @@ test('findUnresolvedOuterLeadingTone', () => {
             [1, 3, 5, 1],
             [null, domSeventh, tonMaj]
         )
-    ).toEqual({
+    ).toMatchObject({
         isCorrect: true,
         message: 'The leading tone in the following voice part is resolved correctly',
-        list: [3]
+        list: [VOICE_PARTS[3]]
     });
 
     expect(
@@ -460,10 +451,10 @@ test('findUnresolvedOuterLeadingTone', () => {
             [1, 3, 5, 1],
             [null, domSeventh, tonMaj]
         )
-    ).toEqual({
+    ).toMatchObject({
         isCorrect: false,
         message: 'The leading tone in the following voice part is not resolved correctly',
-        list: [3]
+        list: [VOICE_PARTS[3]]
     });
 
     expect(
@@ -475,9 +466,9 @@ test('findUnresolvedOuterLeadingTone', () => {
             [6, 1, 3, 6],
             [tonMaj, domSeventh, submedFirstInversionMin]
         )
-    ).toEqual({
+    ).toMatchObject({
         isCorrect: true,
         message: 'The leading tone in the following voice part is resolved correctly',
-        list: [3]
+        list: [VOICE_PARTS[3]]
     });
-});
+}); 

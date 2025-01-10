@@ -1,4 +1,4 @@
-import { accidentals, chordIntervals } from "./consts";
+import { accidentals, chordIntervals, INTERVALS } from "./consts";
 
 export type ScaleDegree = {
     /**
@@ -43,6 +43,19 @@ export type Chord = {
 export type ChordNames = keyof typeof chordIntervals;
 export type AccidentalNames = keyof typeof accidentals;
 
+export type Outline<T = ''> = {
+    points: number;
+    correctMessage: string;
+    errorMessage: string;
+    criterion: Criterion;
+} & (T extends 'Array' ? {
+    array: string[]
+} : T extends '2DArray' ? {
+    col1: string[];
+    col2: string[];
+    seperator: string;
+} : {});
+
 /** A unit of feedback based on a criterion in the AP music theory scoring guidline. */
 export type Feedback = {
     /** The number of points lost based on the criterion. If `isCorrect` is `true`, should be `0`. */
@@ -74,3 +87,5 @@ export type noteInterval = number;
 
 /** The MIDI index of a pitch. */
 export type MIDIPitch = number;
+
+export type Interval = typeof INTERVALS[number];
