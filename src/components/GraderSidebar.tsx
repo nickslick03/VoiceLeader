@@ -1,4 +1,4 @@
-import { For, createEffect, createMemo, createSignal, untrack } from "solid-js"
+import { createMemo, createSignal } from "solid-js"
 import { VoiceLead, Result } from "../util/types";
 import GraderDropdown from "./GraderDropdown";
 import { useScoreview } from "./ScoreviewProvider";
@@ -38,7 +38,7 @@ const GraderSidebar = () => {
                 ? 0 
                 : result.points + points, 0);
         const voiceLeadingPoints = voiceLeadingResultsList()?.reduce<number>((points, result) => points + result.points, 0);
-        return (spellingPoints ?? 0) + (voiceLeadingPoints ?? 0);
+        return Math.ceil((spellingPoints ?? 0) + (voiceLeadingPoints ?? 0));
     });
 
     const chordArr = createMemo(() => useChords()[0]);
@@ -53,7 +53,7 @@ const GraderSidebar = () => {
 
             setVoiceLeadingResultsList(getVoiceLeadingReports(
                 vc, 
-                spellingResults.map(r => r.points === 1),
+                spellingResults.map(r => r.points > 0),
                 chordArr(),
             ))
         }

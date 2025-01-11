@@ -97,7 +97,7 @@ const voiceLeadingOutlinesWithBooleans: Record<string, Outline> = {
     },
     'isNotHiddenOctave': {
         correctMessage: 'No hidden octave in the outer parts',
-        errorMessage: 'There is a octave fifth in the outer parts',
+        errorMessage: 'There is a hidden octave in the outer parts',
         points: 1,
         criterion: {
             numeral: 'II',
@@ -109,7 +109,6 @@ const voiceLeadingOutlinesWithBooleans: Record<string, Outline> = {
 
 const voiceLeadingOutlinesWithArrays: Record<string, Outline<'Array'>> = {
     'findIncorrectApproachToChordalSeventh': {
-        //noneMessage: 'No chordal seventh',
         correctMessage: 'The chordal seventh was apporached correctly',
         errorMessage: 'The chordal seventh in the following part was not approached correctly (by a descending leap of a fourth or larger):',
         array: VOICE_PARTS,
@@ -120,18 +119,6 @@ const voiceLeadingOutlinesWithArrays: Record<string, Outline<'Array'>> = {
             number: [4]
         }
     },
-    // 'findUnresolvedChordalSeventh': {
-    //     //noneMessage: 'No chordal seventh',
-    //     correctMessage: 'The chordal seventh was resolved correctly',
-    //     errorMessage: 'The chordal seventh in the following part was not resolved correctly:',
-    //     array: VOICE_PARTS,
-    //     points: 2,
-    //     criterion: {
-    //         numeral: 'II',
-    //         letter: 'D',
-    //         number: [3]
-    //     }
-    // }
 }
 
 /**
@@ -599,14 +586,14 @@ export function getVoiceLeadingReports(
         let points = 2;
 
         const feedbacks = Object.entries({
+            'findParallelUnisons': findParallelUnisons(chordIndices[i - 1], chordIndices[i]),
+            'findParallelFifths': findParallelFifths(chordIndices[i - 1], chordIndices[i]),
+            'findParallelOctaves': findParallelOctaves(chordIndices[i - 1], chordIndices[i]),
             'findUncharacteristicUnequalFifths': findUncharacteristicUnequalFifths(chordIndices[i - 1], chordIndices[i], chords[i]),
             'isNotHiddenFifth': isNotHiddenFifth([chordIndices[i - 1][0], chordIndices[i - 1][3]], [chordIndices[i][0], chordIndices[i][3]]),
             'isNotHiddenOctave': isNotHiddenOctave([chordIndices[i - 1][0], chordIndices[i - 1][3]], [chordIndices[i][0], chordIndices[i][3]]),
             'findOverlappingVoices': findOverlappingVoices(chordIndices[i - 1], chordIndices[i]),
             'findIncorrectApproachToChordalSeventh': findIncorrectApproachToChordalSeventh(chordIndices[i - 1], chordIndices[i], chordIntervals[i], chords[i], isKeyMajor),
-            'findParallelUnisons': findParallelUnisons(chordIndices[i - 1], chordIndices[i]),
-            'findParallelFifths': findParallelFifths(chordIndices[i - 1], chordIndices[i]),
-            'findParallelOctaves': findParallelOctaves(chordIndices[i - 1], chordIndices[i]),
             'findUncharacteristicLeaps': findUncharacteristicLeaps(chordIndices[i - 1], scaleDegrees[i - 1], chordIndices[i], scaleDegrees[i]),
             'findUnresolvedChordalSeventh': findUnresolvedChordalSeventh(scaleDegrees[i - 1], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]]),
             'findUnresolvedOuterLeadingTone': findUnresolvedOuterLeadingTone(chordIntervals[i - 1], chordIndices[i - 1], scaleDegrees[i - 1], chordIndices[i], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]]),
@@ -638,12 +625,12 @@ export function getVoiceLeadingReports(
             return fb;
         });
 
-        totalPoints += points;
+        totalPoints += Math.max(points, 0);
 
         return {
             title: `Chord ${i} → ${i + 1}`,
             feedbacks,
-            points,
+            points: Math.max(points, 0),
         };
     });
 
