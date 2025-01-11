@@ -15,12 +15,8 @@ const GraderSidebar = () => {
 
     const [voiceLead, setVoicelead] = createSignal<VoiceLead>();
 
-    const [isKeyMajor, setIsKeyMajor] = createSignal<boolean>();
 
-    const [totalPoints, setTotalPoints] = createSignal(0);
-
-    const resetGrading = () => {
-        setTotalPoints(0);
+    const resetVoicelead = () => {
         scoreview()
         ?.getScore()
         .done((score) => {
@@ -28,17 +24,26 @@ const GraderSidebar = () => {
             ?.getKeySignature()
             .done((keySignature) => {
                 setVoicelead(scoreToVoiceLead(score, keySignature));
-                setIsKeyMajor(keySignature.mode === 'major');
             });
         });
+        resetGrading();
     };
 
     const [chordSpellingResultsList, setChordSpellingResultsList] = createSignal<Result[] | undefined>();
     const [voiceLeadingResultsList, setVoiceLeadingResultsList] = createSignal<Result[] | undefined>();
 
+    const totalPoints = createMemo(() => {
+        const spellingPoints = chordSpellingResultsList()?.reduce<number>((points, result, index) => 
+            index === 0 
+                ? 0 
+                : result.points + points, 0);
+        const voiceLeadingPoints = voiceLeadingResultsList()?.reduce<number>((points, result) => points + result.points, 0);
+        return (spellingPoints ?? 0) + (voiceLeadingPoints ?? 0);
+    });
+
     const chordArr = createMemo(() => useChords()[0]);
 
-    createEffect(() => {
+    const resetGrading = () => {
         const vc = voiceLead();
         if (vc !== undefined) {
             console.log(vc)
@@ -46,23 +51,13 @@ const GraderSidebar = () => {
                 getChordSpellingResults(vc, chordArr())
             );
 
-                setVoiceLeadingResultsList(getVoiceLeadingReports(
-                [vc.bass, vc.tenor, vc.alto, vc.soprano], 
-                spellingResults.map((r, i) => r.points > 0),
+            setVoiceLeadingResultsList(getVoiceLeadingReports(
+                vc, 
+                spellingResults.map(r => r.points === 1),
                 chordArr(),
-                untrack(isKeyMajor) ?? true    
             ))
         }
-    });
-
-    createEffect(() => {
-        setTotalPoints(points => 
-            points + (chordSpellingResultsList()?.reduce<number>((points, result, index) => 
-                index === 0 
-                    ? 0 
-                    : result.points + points, 0) 
-            ?? 0));
-    });
+    };
 
     return (
         <>
@@ -70,10 +65,10 @@ const GraderSidebar = () => {
                 class="fixed top-8 right-4 px-4 py-2 text-white
                 bg-green-600 shadow-md shadow-[rgba(0,0,0,.3)] hover:bg-green-400"
                 onClick={() => {
-                    resetGrading();
+                    resetVoicelead();
                     setIsVisible(true);
                     }}>
-                Grade
+                Open Grader
             </button>
             <div 
                 class="fixed top-0 left-full w-96 text-center
@@ -108,8 +103,8 @@ const GraderSidebar = () => {
                     </button>
                     <button
                         class="text-white px-4 py-2 bg-green-600 shadow-md shadow-[rgba(0,0,0,.3)] hover:bg-green-400"
-                        onClick={() => resetGrading()}>
-                        Grade Again
+                        onClick={() => resetVoicelead()}>
+                        Grade
                     </button>  
                 </div>
             </div>

@@ -272,13 +272,14 @@ function getChordSpellingResult(
         'doubledLeadingTone': doubledLeadingTone(chordIntervals),
         'doubledChordalSeventh': chord.isSeventh 
             ? doubledChordalSeventh(chordIntervals, correctIntervals[3]) 
-            : [],
+            : null,
         'is64ChordDoubledCorrectly': chord.inversion === 2 && !chord.isSeventh
             ? is64ChordDoubledCorrectly(chordIntervals, correctIntervals[2])
             : true,
         'voiceDistance': voiceDistance(pitchList[1], pitchList[2], pitchList[3]),
         'voiceCrossings': voiceCrossings(pitchList[0], pitchList[1], pitchList[2], pitchList[3]),
         })
+        .filter(([, v]) => v !== null)
         .map<Feedback>(([key, val]) => {
             let fb: Feedback;
             if (key in chordSpellingOutlinesWithArrays) {

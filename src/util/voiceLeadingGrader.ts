@@ -1,5 +1,5 @@
 import { C_SCALE, INTERVALS, NOTE_LETTERS, VOICE_PARTS } from "./consts";
-import { realizeChord, scaleDegreeToInterval } from "./converters";
+import { noteToMidiIndex, realizeChord, scaleDegreeToInterval } from "./converters";
 import { feedbackTransformers } from "./feedbackTransformers";
 import { VoicePart, Chord, Feedback, Result, Interval, Outline, VoiceLead } from "./types";
 
@@ -85,7 +85,7 @@ const voiceLeadingOutlinesWith2DArrays: Record<string, Outline<"2DArray">> = {
 }
 
 const voiceLeadingOutlinesWithBooleans: Record<string, Outline> = {
-    'isHiddenFifth': {
+    'isNotHiddenFifth': {
         correctMessage: 'No hidden fifth in the outer parts',
         errorMessage: 'There is a hidden fifth in the outer parts',
         points: 1,
@@ -95,7 +95,7 @@ const voiceLeadingOutlinesWithBooleans: Record<string, Outline> = {
             number: [2]
         }
     },
-    'isHiddenOctave': {
+    'isNotHiddenOctave': {
         correctMessage: 'No hidden octave in the outer parts',
         errorMessage: 'There is a octave fifth in the outer parts',
         points: 1,
@@ -120,18 +120,18 @@ const voiceLeadingOutlinesWithArrays: Record<string, Outline<'Array'>> = {
             number: [4]
         }
     },
-    'findUnresolvedChordalSeventh': {
-        //noneMessage: 'No chordal seventh',
-        correctMessage: 'The chordal seventh was resolved correctly',
-        errorMessage: 'The chordal seventh in the following part was not resolved correctly:',
-        array: VOICE_PARTS,
-        points: 2,
-        criterion: {
-            numeral: 'II',
-            letter: 'D',
-            number: [3]
-        }
-    }
+    // 'findUnresolvedChordalSeventh': {
+    //     //noneMessage: 'No chordal seventh',
+    //     correctMessage: 'The chordal seventh was resolved correctly',
+    //     errorMessage: 'The chordal seventh in the following part was not resolved correctly:',
+    //     array: VOICE_PARTS,
+    //     points: 2,
+    //     criterion: {
+    //         numeral: 'II',
+    //         letter: 'D',
+    //         number: [3]
+    //     }
+    // }
 }
 
 /**
@@ -227,7 +227,7 @@ export function findUncharacteristicUnequalFifths(chord1Notes: number[], chord2N
         const topNote2 = chord2Notes[upperIntervalIndicies[i][1]];
         if (interval.interval == 'd5' && upperIntervals2[i].interval == 'P5' // d5->P5
             && ((topNote1 % 12) < (topNote2 % 12) || (bottomNote1 % 12) < (bottomNote2 % 12)) // Rising d5->P5
-            && !(secondChord.numeral == 1 && secondChord.inversion == 2)) // Passing to I^6 (I in second inversion)
+            && !(secondChord.numeral == 1 && secondChord.inversion == 1)) // Not passing to I^6 (I in second inversion)
             results.push(upperIntervalIndicies[i]);
     });
 
@@ -241,13 +241,13 @@ HIDDEN FIFTHS / OCTAVES
  - lower voice moves by step
 */
 
-export function isHiddenInterval(outerVoices1: [number, number], outerVoices2: [number, number], interval: Interval) {
+export function isNotHiddenInterval(outerVoices1: [number, number], outerVoices2: [number, number], interval: Interval) {
     const diff1 = outerVoices1[0] - outerVoices2[0];
     const diff2 = outerVoices1[1] - outerVoices2[1];
     const bassInterval = getInterval(outerVoices1[0], outerVoices2[0]).interval;
-    return ((diff1 > 0 && diff2 > 0) || (diff1 < 0 && diff2 < 0)) // similar motion
+    return !(((diff1 > 0 && diff2 > 0) || (diff1 < 0 && diff2 < 0)) // similar motion
     && getInterval(outerVoices2[0], outerVoices2[1]).interval === interval
-    && (bassInterval === 'm2' || bassInterval === 'M2');
+    && (bassInterval === 'm2' || bassInterval === 'M2'));
 }
 
 /**
@@ -256,8 +256,8 @@ export function isHiddenInterval(outerVoices1: [number, number], outerVoices2: [
  * @param outerVoices2 the bass and soprano voices of the 2nd chord represented in MIDI indices
  * @returns true if there's an unacceptable hidden fifth and false if there isn't.
  */
-export function isHiddenFifth(outerVoices1: [number, number], outerVoices2: [number, number]) {
-    return isHiddenInterval(outerVoices1, outerVoices2, 'P5');
+export function isNotHiddenFifth(outerVoices1: [number, number], outerVoices2: [number, number]) {
+    return isNotHiddenInterval(outerVoices1, outerVoices2, 'P5');
 }
 
 /**
@@ -266,8 +266,8 @@ export function isHiddenFifth(outerVoices1: [number, number], outerVoices2: [num
  * @param outerVoices2 the bass and soprano voices of the 2nd chord represented in MIDI indices
  * @returns true if there's an unacceptable hidden octave and false if there isn't.
  */
-export function isHiddenOctave(outerVoices1: [number, number], outerVoices2: [number, number]) {
-    return isHiddenInterval(outerVoices1, outerVoices2, '0');
+export function isNotHiddenOctave(outerVoices1: [number, number], outerVoices2: [number, number]) {
+    return isNotHiddenInterval(outerVoices1, outerVoices2, '0');
 }
 
 /**
@@ -543,6 +543,9 @@ function flip2DArray<T>(array: T[][]): T[][] {
     return flippedArray;
 }
 
+const M = noteToMidiIndex;
+
+
 export function getVoiceLeadingReports(
     voiceLead: VoiceLead, correctChordRealizations: boolean[], chords: Chord[]): Result[] {
     
@@ -559,11 +562,18 @@ export function getVoiceLeadingReports(
 
     let leaps = 0;
 
+    console.log(chords);
+
     const chordIntervals = flip2DArray(userChords.map(userChord => 
         userChord.map(({scaleDegree}) => scaleDegreeToInterval(scaleDegree, isKeyMajor))));
     const chordLetters = flip2DArray(userChords.map(userChord => userChord.map(({note}) => C_SCALE[note.step])));
     const chordIndices = flip2DArray(userChords.map(userChord => userChord.map(({note}) => note.pitch)));
     const scaleDegrees = flip2DArray(userChords.map(userChord => userChord.map(({scaleDegree}) => scaleDegree.degree)));
+
+    console.log(chordIndices);
+
+    console.log([M('Eb2'), M('C3'), M('Ab3'), M('Eb4')],
+    [M('Eb2'), M('Bb2'), M('G3'), M('Db4')],)
 
     const results: Result[] = [1,2,3,4,5,6].map(i => {
 
@@ -574,7 +584,7 @@ export function getVoiceLeadingReports(
                 points: 0,
                 feedbacks: [{
                     isCorrect: false,
-                    message:`Chord${both ? 's' : ''} ${correctChordRealizations[i - 1] ? i - 1 : ''} ${both ? 'and' : ''} ${correctChordRealizations[i] ? i : ''} ${both ? 'are' : 'is'} not spelled correctly.`,
+                    message:`Chord${both ? 's' : ''} ${!correctChordRealizations[i - 1] ? i : ''} ${both ? 'and' : ''} ${!correctChordRealizations[i] ? i + 1 : ''} ${both ? 'are' : 'is'} not spelled correctly.`,
                     pointsLost: 2,
                     criterion: {
                         numeral: 'II',
@@ -590,8 +600,8 @@ export function getVoiceLeadingReports(
 
         const feedbacks = Object.entries({
             'findUncharacteristicUnequalFifths': findUncharacteristicUnequalFifths(chordIndices[i - 1], chordIndices[i], chords[i]),
-            'isHiddenFifth': isHiddenFifth([chordIndices[i - 1][0], chordIndices[i - 1][3]], [chordIndices[i][0], chordIndices[i][3]]),
-            'isHiddenOctave': isHiddenOctave([chordIndices[i - 1][0], chordIndices[i - 1][3]], [chordIndices[i][0], chordIndices[i][3]]),
+            'isNotHiddenFifth': isNotHiddenFifth([chordIndices[i - 1][0], chordIndices[i - 1][3]], [chordIndices[i][0], chordIndices[i][3]]),
+            'isNotHiddenOctave': isNotHiddenOctave([chordIndices[i - 1][0], chordIndices[i - 1][3]], [chordIndices[i][0], chordIndices[i][3]]),
             'findOverlappingVoices': findOverlappingVoices(chordIndices[i - 1], chordIndices[i]),
             'findIncorrectApproachToChordalSeventh': findIncorrectApproachToChordalSeventh(chordIndices[i - 1], chordIndices[i], chordIntervals[i], chords[i], isKeyMajor),
             'findParallelUnisons': findParallelUnisons(chordIndices[i - 1], chordIndices[i]),
@@ -601,7 +611,7 @@ export function getVoiceLeadingReports(
             'findUnresolvedChordalSeventh': findUnresolvedChordalSeventh(scaleDegrees[i - 1], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]]),
             'findUnresolvedOuterLeadingTone': findUnresolvedOuterLeadingTone(chordIntervals[i - 1], chordIndices[i - 1], scaleDegrees[i - 1], chordIndices[i], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]]),
         })
-        .filter(([k, v]) => v !== null)
+        .filter(([, v]) => v !== null)
         .map<Feedback>(([key, value], i) => {
             let fb: Feedback;
             if (key in voiceLeadingOutlinesWith2DArrays) {

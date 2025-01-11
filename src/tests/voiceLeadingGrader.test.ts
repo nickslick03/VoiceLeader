@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { findLeaps, getInterval, findUncharacteristicUnequalFifths, isHiddenFifth, isHiddenOctave, findIncorrectApproachToChordalSeventh, findParallelFifths, findParallelOctaves, findParallelUnisons, findOverlappingVoices, findUncharacteristicLeaps, findUnresolvedChordalSeventh, findUnresolvedOuterLeadingTone } from "../util/voiceLeadingGrader";
+import { findLeaps, getInterval, findUncharacteristicUnequalFifths, isNotHiddenFifth, isNotHiddenOctave, findIncorrectApproachToChordalSeventh, findParallelFifths, findParallelOctaves, findParallelUnisons, findOverlappingVoices, findUncharacteristicLeaps, findUnresolvedChordalSeventh, findUnresolvedOuterLeadingTone } from "../util/voiceLeadingGrader";
 import { noteToMidiIndex } from "../util/converters";
 import { majorIntervals, VOICE_PARTS } from "../util/consts";
 import { Chord } from "../util/types";
@@ -95,7 +95,7 @@ test('findUncharacteristicUnequalFifths', () => {
                 numeral: 1,
                 quality: "major",
                 isSeventh: false,
-                inversion: 2,
+                inversion: 1,
                 secondary: 1,
                 secondaryQuality: 'major'
             }
@@ -117,40 +117,56 @@ test('findUncharacteristicUnequalFifths', () => {
             }
         )
     ).toEqual([]);
+
+
+    expect(
+        findUncharacteristicUnequalFifths(
+            [M('Eb2'), M('C3'), M('Ab3'), M('Eb4')],
+            [M('Eb2'), M('Bb2'), M('G3'), M('Db4')],
+            {
+                numeral: 5,
+                quality: 'majorMinor',
+                isSeventh: true,
+                inversion: 0,
+                secondary: 1,
+                secondaryQuality: 'major'
+            }
+        )
+    ).toEqual([]);
 });
 
 test('isHiddenFifth', () => {
 
     expect(
-        isHiddenFifth(
+        isNotHiddenFifth(
             [40, 60], 
             [43, 62]
         )
-    ).toBe(false);
+    ).toBe(true);
 
     expect(
-        isHiddenFifth(
+        isNotHiddenFifth(
             [41, 57],
             [43, 62]
         )
-    ).toBe(true);
+    ).toBe(false);
 });
 
 test('isHiddenOctave', () => {
 
     expect(
-        isHiddenOctave(
+        isNotHiddenOctave(
             [35, 60], 
             [38, 62]
         )
-    ).toBe(false);
+    ).toBe(true);
 
     expect(
-        isHiddenOctave(
+        isNotHiddenOctave(
             [36, 57],
             [38, 62]
         )
-    ).toBe(true);
+    ).toBe(false);
 });
 
 test('findIncorrectApproachToChordalSeventh', () => {
