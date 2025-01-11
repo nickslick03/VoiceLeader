@@ -1,7 +1,7 @@
 import { C_SCALE, INTERVALS, NOTE_LETTERS, VOICE_PARTS } from "./consts";
 import { noteToMidiIndex, realizeChord, scaleDegreeToInterval } from "./converters";
 import { feedbackTransformers } from "./feedbackTransformers";
-import { VoicePart, Chord, Feedback, Result, Interval, Outline, VoiceLead } from "./types";
+import { Chord, Feedback, Result, Interval, Outline, VoiceLead, MIDIPitch } from "./types";
 
 const voiceLeadingOutlinesWith2DArrays: Record<string, Outline<"2DArray">> = {
     'findUncharacteristicUnequalFifths': {
@@ -152,14 +152,14 @@ export function findLeaps2(scaleDegrees1: number[], chordIndices1: number[], sca
 
 /**
  * Caculates the interval between two notes.
- * @param lowNoteIndex The lower note as a MIDI index
- * @param highNoteIndex The higher note as a MIDI index
+ * @param lowNotePitch The lower note as a MIDI index
+ * @param highNotePitch The higher note as a MIDI index
  * @returns an interval object the fields `isAscending`, `octaves`, and the `interval` string.
  */
-export function getInterval(lowNoteIndex: number, highNoteIndex: number) {
+export function getInterval(lowNotePitch: MIDIPitch, highNotePitch: MIDIPitch) {
     return {
-        octaves: Math.floor((highNoteIndex - lowNoteIndex) / 12),
-        interval: INTERVALS[(highNoteIndex - lowNoteIndex) % 12]
+        octaves: Math.floor((highNotePitch - lowNotePitch) / 12),
+        interval: INTERVALS[(highNotePitch - lowNotePitch) % 12]
     };
 }
 
@@ -174,15 +174,15 @@ export function getInterval(lowNoteIndex: number, highNoteIndex: number) {
  
 /**
  * Checks if there is unacceptable unequal fifths in the upper voices (II. Voice Leading, C-1)
- * @param chord1Notes An array of the chord notes in MIDI indices from bass to soprano.
- * @param chord2Notes An array of the chord notes in MIDI indices from bass to soprano.
+ * @param chord1Pitches An array of the chord notes in MIDI indices from bass to soprano.
+ * @param chord2Pitches An array of the chord notes in MIDI indices from bass to soprano.
  * @returns an array of the indices of the voice parts where uncharacteristic unequal fifths were found. If empty, no unequal fifths were found.
  */
-export function findUncharacteristicUnequalFifths(chord1Notes: number[], chord2Notes: number[], secondChord: Chord) {
+export function findUncharacteristicUnequalFifths(chord1Pitches: MIDIPitch[], chord2Pitches: MIDIPitch[], secondChord: Chord) {
     const results: [number, number][] = [];
 
-    const bassIntervals1 = chord1Notes.slice(1).map(note => getInterval(chord1Notes[0], note));
-    const bassIntervals2 = chord2Notes.slice(1).map(note => getInterval(chord2Notes[0], note));
+    const bassIntervals1 = chord1Pitches.slice(1).map(note => getInterval(chord1Pitches[0], note));
+    const bassIntervals2 = chord2Pitches.slice(1).map(note => getInterval(chord2Pitches[0], note));
     
     bassIntervals1.forEach((interval, i) => {
         if (interval.interval === 'd5' && bassIntervals2[0].interval === 'P5')
@@ -196,22 +196,22 @@ export function findUncharacteristicUnequalFifths(chord1Notes: number[], chord2N
     ];
 
     const upperIntervals1 = [
-        getInterval(chord1Notes[1], chord1Notes[2]), // tenor to alto
-        getInterval(chord1Notes[1], chord1Notes[3]), // tenor to soprano
-        getInterval(chord1Notes[2], chord1Notes[3])  // alto to soprano
+        getInterval(chord1Pitches[1], chord1Pitches[2]), // tenor to alto
+        getInterval(chord1Pitches[1], chord1Pitches[3]), // tenor to soprano
+        getInterval(chord1Pitches[2], chord1Pitches[3])  // alto to soprano
     ];
 
     const upperIntervals2 = [
-        getInterval(chord2Notes[1], chord2Notes[2]), // tenor to alto
-        getInterval(chord2Notes[1], chord2Notes[3]), // tenor to soprano
-        getInterval(chord2Notes[2], chord2Notes[3])  // alto to soprano
+        getInterval(chord2Pitches[1], chord2Pitches[2]), // tenor to alto
+        getInterval(chord2Pitches[1], chord2Pitches[3]), // tenor to soprano
+        getInterval(chord2Pitches[2], chord2Pitches[3])  // alto to soprano
     ];
 
     upperIntervals1.forEach((interval, i) => {
-        const bottomNote1 = chord1Notes[upperIntervalIndicies[i][0]];
-        const topNote1 = chord1Notes[upperIntervalIndicies[i][1]];
-        const bottomNote2 = chord2Notes[upperIntervalIndicies[i][0]];
-        const topNote2 = chord2Notes[upperIntervalIndicies[i][1]];
+        const bottomNote1 = chord1Pitches[upperIntervalIndicies[i][0]];
+        const topNote1 = chord1Pitches[upperIntervalIndicies[i][1]];
+        const bottomNote2 = chord2Pitches[upperIntervalIndicies[i][0]];
+        const topNote2 = chord2Pitches[upperIntervalIndicies[i][1]];
         if (interval.interval == 'd5' && upperIntervals2[i].interval == 'P5' // d5->P5
             && ((topNote1 % 12) < (topNote2 % 12) || (bottomNote1 % 12) < (bottomNote2 % 12)) // Rising d5->P5
             && !(secondChord.numeral == 1 && secondChord.inversion == 1)) // Not passing to I^6 (I in second inversion)
@@ -228,7 +228,7 @@ HIDDEN FIFTHS / OCTAVES
  - lower voice moves by step
 */
 
-export function isNotHiddenInterval(outerVoices1: [number, number], outerVoices2: [number, number], interval: Interval) {
+export function isNotHiddenInterval(outerVoices1: [MIDIPitch, MIDIPitch], outerVoices2: [MIDIPitch, MIDIPitch], interval: Interval) {
     const diff1 = outerVoices1[0] - outerVoices2[0];
     const diff2 = outerVoices1[1] - outerVoices2[1];
     const bassInterval = getInterval(outerVoices1[0], outerVoices2[0]).interval;
@@ -243,7 +243,7 @@ export function isNotHiddenInterval(outerVoices1: [number, number], outerVoices2
  * @param outerVoices2 the bass and soprano voices of the 2nd chord represented in MIDI indices
  * @returns true if there's an unacceptable hidden fifth and false if there isn't.
  */
-export function isNotHiddenFifth(outerVoices1: [number, number], outerVoices2: [number, number]) {
+export function isNotHiddenFifth(outerVoices1: [MIDIPitch, MIDIPitch], outerVoices2: [MIDIPitch, MIDIPitch]) {
     return isNotHiddenInterval(outerVoices1, outerVoices2, 'P5');
 }
 
@@ -253,23 +253,23 @@ export function isNotHiddenFifth(outerVoices1: [number, number], outerVoices2: [
  * @param outerVoices2 the bass and soprano voices of the 2nd chord represented in MIDI indices
  * @returns true if there's an unacceptable hidden octave and false if there isn't.
  */
-export function isNotHiddenOctave(outerVoices1: [number, number], outerVoices2: [number, number]) {
+export function isNotHiddenOctave(outerVoices1: [MIDIPitch, MIDIPitch], outerVoices2: [MIDIPitch, MIDIPitch]) {
     return isNotHiddenInterval(outerVoices1, outerVoices2, '0');
 }
 
 /**
  * checks if there is any overlapping voices between two chords.
- * @param chordIndices1 The MIDI indices of the first chord
- * @param chordIndices2 The MIDI indices of the second chord 
+ * @param chordPitches1 The MIDI indices of the first chord
+ * @param chordPitches2 The MIDI indices of the second chord 
  * @returns an 2D array of voice parts where voices overlap. If empty, no voices overlap.
  */
-export function findOverlappingVoices(chordIndices1: number[], chordIndices2: number[]) {
+export function findOverlappingVoices(chordPitches1: MIDIPitch[], chordPitches2: MIDIPitch[]) {
     const results: [number, number][] = [];
     for (let second = 0; second <= 3; second++) {
         for (let first = 0; first <= 3; first++) {
             if (first == second) continue;
-            let note1 = chordIndices1[first];
-            let note2 = chordIndices2[second];
+            let note1 = chordPitches1[first];
+            let note2 = chordPitches2[second];
             if ((second < first && note2 > note1) // lower note is higher than prev high note
                 || (second > first && note2 < note1)) // higher note is lower than prev low note
                 results.push([first, second]);
@@ -280,14 +280,14 @@ export function findOverlappingVoices(chordIndices1: number[], chordIndices2: nu
 
 /**
  * Checks if the chordal seventh of a chord is approached incorrectly, i.e. approached by a descending leap of a fourth or larger.
- * @param chord1Notes An array of the chord notes in MIDI indices from bass to soprano
- * @param chord2Notes An array of the chord notes in MIDI indices from bass to soprano
+ * @param chord1Pitches An array of the chord notes in MIDI indices from bass to soprano
+ * @param chord2Pitches An array of the chord notes in MIDI indices from bass to soprano
  * @param chordIntervals2 the chord intervals of the 2nd chord, from bass to soprano
  * @param chord2 chord2
  * @returns an empty array if the apporach was acceptable, and an array with the index of the voice part (0 for bass, 3 for soprano) if the apporach was unacceptable.
  */
 export function findIncorrectApproachToChordalSeventh(
-    chord1Notes: number[], chord2Notes: number[], chordIntervals2: number[], chord2: Chord, isKeyMajor: boolean) {
+    chord1Pitches: MIDIPitch[], chord2Pitches: MIDIPitch[], chordIntervals2: number[], chord2: Chord, isKeyMajor: boolean) {
 
     if (!chord2.isSeventh) {
         return null;
@@ -297,9 +297,9 @@ export function findIncorrectApproachToChordalSeventh(
     
     const chordalSeventhIndex = chordIntervals2.findIndex(interval => interval === chordalSeventh);
     if (chordalSeventhIndex === -1 
-        || chord1Notes[chordalSeventhIndex] <= chord2Notes[chordalSeventhIndex]) 
+        || chord1Pitches[chordalSeventhIndex] <= chord2Pitches[chordalSeventhIndex]) 
         return [];
-    const { interval, octaves } = getInterval(chord2Notes[chordalSeventhIndex], chord1Notes[chordalSeventhIndex]);
+    const { interval, octaves } = getInterval(chord2Pitches[chordalSeventhIndex], chord1Pitches[chordalSeventhIndex]);
     return (interval.length > 1 && +interval[1] >= 4) || octaves > 0 
         ? [chordalSeventhIndex] 
         : [];
@@ -337,52 +337,52 @@ function findParallelIntervals(
 
 /**
  * Finds any parallel fifths between two chords
- * @param chordIndices1 The MIDI indices of the first chord
- * @param chordIndices2 The MIDI indices of the second chord
+ * @param chord1Pitches The MIDI indices of the first chord
+ * @param chord2Pitches The MIDI indices of the second chord
  * @returns an array of the voice parts where parallel fifths exist (0 for bass, 3 for soprano). If empty, no parallel fifths exist.
  */
-export function findParallelFifths(chordIndices1: number[], chordIndices2: number[]) {
-    return findParallelIntervals("P5", chordIndices1, chordIndices2);
+export function findParallelFifths(chord1Pitches: MIDIPitch[], chord2Pitches: MIDIPitch[]) {
+    return findParallelIntervals("P5", chord1Pitches, chord2Pitches);
 }
 
 /**
  * Finds any parallel octaves between two chords
- * @param chordIndices1 The MIDI indices of the first chord
- * @param chordIndices2 The MIDI indices of the second chord
+ * @param chord1Pitches The MIDI indices of the first chord
+ * @param chord2Pitches The MIDI indices of the second chord
  * @returns an array of the voice parts where parallel octaves exist (0 for bass, 3 for soprano). If empty, no parallel octaves exist.
  */
-export function findParallelOctaves(chordIndices1: number[], chordIndices2: number[]) {
-    return findParallelIntervals("0", chordIndices1, chordIndices2, 1);
+export function findParallelOctaves(chord1Pitches: MIDIPitch[], chord2Pitches: MIDIPitch[]) {
+    return findParallelIntervals("0", chord1Pitches, chord2Pitches, 1);
 }
 
 /**
  * Finds any parallel unisons between two chords.
- * @param chordIndices1 The MIDI indices of the first chord
- * @param chordIndices2 The MIDI indices of the second chord
+ * @param chord1Pitches The MIDI indices of the first chord
+ * @param chord2Pitches The MIDI indices of the second chord
  * @returns an array of the voice parts where parallel unisons exist (0 for bass, 3 for soprano). If empty, no parallel unisons exist.
  */
-export function findParallelUnisons(chordIndices1: number[], chordIndices2: number[]) {
-    return findParallelIntervals("0", chordIndices1, chordIndices2, 0, 0);
+export function findParallelUnisons(chord1Pitches: MIDIPitch[], chord2Pitches: MIDIPitch[]) {
+    return findParallelIntervals("0", chord1Pitches, chord2Pitches, 0, 0);
 }
 
 /**
- * @param chordIndices1 The MIDI indices of the first chord
+ * @param chord1Pitches The MIDI indices of the first chord
  * @param scaleDegrees2 The scale degrees of the first chord (1-7)
- * @param chordIndices2 The MIDI indices of the second chord
+ * @param chord2Pitches The MIDI indices of the second chord
  * @param scaleDegrees2 The scale degrees of the second chord (1-7)
  * @returns a 2D array where each array's first element is the index of the voice (0-4 -> bass-soprano) and the second element is the string of the type of uncharacteristic leap.
  */
 export function findUncharacteristicLeaps(
-    chordIndices1: number[], scaleDegrees1: number[], chordIndices2: number[], scaleDegrees2: number[]) {
+    chord1Pitches: MIDIPitch[], scaleDegrees1: number[], chord2Pitches: MIDIPitch[], scaleDegrees2: number[]) {
         const results: [number, number][] = [];
         for (let i = 0; i <= 3; i++) {
-            const [ lowNote, highNote ] = [chordIndices1[i], chordIndices2[i]].sort((a, b) => a - b);
+            const [ lowNote, highNote ] = [chord1Pitches[i], chord2Pitches[i]].sort((a, b) => a - b);
             const interval = getInterval(lowNote, highNote).interval;
             if (interval === 'm3' && [1, -6].some(diff => diff === scaleDegrees2[i] - scaleDegrees1[i]))
                 results.push([i, 0]);
             else if (interval === 'd5')
                 results.push([i, 1]);
-            else if (Math.abs(chordIndices2[i] - chordIndices1[i]) >= 8)
+            else if (Math.abs(chord2Pitches[i] - chord1Pitches[i]) >= 8)
                 results.push([i, 2]);
         }
         return results;
@@ -448,17 +448,17 @@ export function findUnresolvedChordalSeventh(
 
 /**
  * @param chordIntervals1 the intervals of the chord the user entered
- * @param chordIndices1 The MIDI indices of the first chord
+ * @param chord1Pitches The MIDI indices of the first chord
  * @param scaleDegrees2 The scale degrees of the first chord (1-7)
- * @param chordIndices2 The MIDI indices of the second chord
+ * @param chord2Pitches The MIDI indices of the second chord
  * @param scaleDegrees2 The scale degrees of the second chord (1-7)
  * @param chords An array of chord objects, where chords[1] is the 1st chord, chords[2] is the 2nd chord and chords[0] is the chord that came before 1 (it may be null if chords[1] was the first chord in the harmonization).
  */
 export function findUnresolvedOuterLeadingTone(
     chordIntervals1: number[],
-    chordIndices1: number[], 
+    chord1Pitches: MIDIPitch[], 
     scaleDegrees1: number[], 
-    chordIndices2: number[], 
+    chord2Pitches: MIDIPitch[], 
     scaleDegrees2: number[], 
     chords: [Chord | null, Chord, Chord]): Feedback {
 
@@ -488,7 +488,7 @@ export function findUnresolvedOuterLeadingTone(
     && chords[2].numeral === 6 && chords[2].quality === 'minor' && chords[2].inversion === 0;
 
     const incorrectLeadingTones = outerSeventhIndexes.filter(i =>
-        !((scaleDegrees2[i] === 1 && chordIndices2[i] - chordIndices1[i] === 1)
+        !((scaleDegrees2[i] === 1 && chord2Pitches[i] - chord1Pitches[i] === 1)
         || (isOneFiveSixProg && scaleDegrees2[i] === 6))
     );
 
