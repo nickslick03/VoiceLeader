@@ -1,7 +1,7 @@
 import { JSX, createContext, useContext } from "solid-js";
 import { SetStoreFunction, createStore } from "solid-js/store";
 import type { Chord } from "../util/types";
-import { get, set } from "../util/localStorage";
+import { localStorageGet, localStorageSet } from "../util/localStorage";
 import { CHORD_QUALITIES, LOCAL_STORAGE_KEYS } from "../util/consts";
 
 const ChordContext = createContext<[get: Chord[], set: SetStoreFunction<Chord[]>]>();
@@ -28,13 +28,13 @@ export function ChordsProvider(props: {
       secondaryQuality: 'major'
   }));
 
-  const chordStorage = get<Chord[]>(LOCAL_STORAGE_KEYS.CHORDS);
+  const chordStorage = localStorageGet<Chord[]>(LOCAL_STORAGE_KEYS.CHORDS);
 
   let chords: Chord[];
 
   if (chordStorage === null) {
     chords = defaultChords;
-    set(LOCAL_STORAGE_KEYS.CHORDS, chords);
+    localStorageSet(LOCAL_STORAGE_KEYS.CHORDS, chords);
   } else {
     let isChordStorageValid = true;
     for (let i = 0; i < chordStorage.length; i++) {
@@ -53,7 +53,7 @@ export function ChordsProvider(props: {
       chords = chordStorage;
     } else {
       chords = defaultChords;
-      set(LOCAL_STORAGE_KEYS.CHORDS, chords);
+      localStorageSet(LOCAL_STORAGE_KEYS.CHORDS, chords);
     } 
   }
 
@@ -74,7 +74,7 @@ export function useChords() {
     getChords,
     (index: number, chord: Chord) => {
       setChords(index, chord);
-      set(LOCAL_STORAGE_KEYS.CHORDS, getChords);
+      localStorageSet(LOCAL_STORAGE_KEYS.CHORDS, getChords);
     }
   ]
 }

@@ -1,9 +1,9 @@
-export function set(key: string, value: any) {
+export function localStorageSet(key: string, value: any) {
     const jsonValue = JSON.stringify(value);
     localStorage.setItem(key, jsonValue);
 }
 
-export function get<T>(key: string) {
+export function localStorageGet<T>(key: string) {
     const strValue = localStorage.getItem(key);
     if (strValue !== null)
         return JSON.parse(strValue) as T;
