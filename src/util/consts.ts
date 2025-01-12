@@ -34,3 +34,9 @@ export const chordIntervals = {
 export const CHORD_DEGREES = [1, 3, 5, 7];
 export const VOICE_PARTS = ['bass part', 'tenor part', 'alto part', 'soprano part'];
 export const CHORD_ORDINALS = ['1st', '3rd', '5th', '7th'];
+
+export const CHORD_QUALITIES = ['major', 'majorMinor', 'minor', 'halfDiminished', 'diminished'];
+
+export enum LOCAL_STORAGE_KEYS {
+    CHORDS = 'chords'
+};
