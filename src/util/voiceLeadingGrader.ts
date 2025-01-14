@@ -565,7 +565,7 @@ export function getVoiceLeadingReports(
     const results: Result[] = [1,2,3,4,5,6].map(i => {
 
         if (!correctChordRealizations[i - 1] || !correctChordRealizations[i]) {
-            const both = correctChordRealizations[i - 1] && correctChordRealizations[i];
+            const both = !correctChordRealizations[i - 1] && !correctChordRealizations[i];
             return {
                 title: `Chord ${i} → ${i + 1}`,
                 points: 0,
