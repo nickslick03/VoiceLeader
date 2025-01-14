@@ -37,6 +37,7 @@ export const CHORD_ORDINALS = ['1st', '3rd', '5th', '7th'];
 
 export const CHORD_QUALITIES = ['major', 'majorMinor', 'minor', 'halfDiminished', 'diminished'];
 
-export enum LOCAL_STORAGE_KEYS {
-    CHORDS = 'chords'
-};
+export const LOCAL_STORAGE_KEYS = {
+    CHORDS: 'chords',
+    SCORE_DATA: 'scoreData'
+} as const;
