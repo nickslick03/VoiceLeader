@@ -549,18 +549,11 @@ export function getVoiceLeadingReports(
 
     let leaps = 0;
 
-    console.log(chords);
-
     const chordIntervals = flip2DArray(userChords.map(userChord => 
         userChord.map(({scaleDegree}) => scaleDegreeToInterval(scaleDegree, isKeyMajor))));
     const chordLetters = flip2DArray(userChords.map(userChord => userChord.map(({note}) => C_SCALE[note.step])));
     const chordIndices = flip2DArray(userChords.map(userChord => userChord.map(({note}) => note.pitch)));
     const scaleDegrees = flip2DArray(userChords.map(userChord => userChord.map(({scaleDegree}) => scaleDegree.degree)));
-
-    console.log(chordIndices);
-
-    console.log([M('Eb2'), M('C3'), M('Ab3'), M('Eb4')],
-    [M('Eb2'), M('Bb2'), M('G3'), M('Db4')],)
 
     const results: Result[] = [1,2,3,4,5,6].map(i => {
 
