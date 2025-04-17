@@ -76,5 +76,5 @@ export function useChords() {
       setChords(index, chord);
       localStorageSet(LOCAL_STORAGE_KEYS.CHORDS, getChords);
     }
-  ]
+  ] as const;
 }

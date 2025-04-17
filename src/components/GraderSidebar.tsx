@@ -24,9 +24,9 @@ const GraderSidebar = () => {
             ?.getKeySignature()
             .done((keySignature) => {
                 setVoicelead(scoreToVoiceLead(score, keySignature));
+                resetGrading();
             });
         });
-        resetGrading();
     };
 
     const [chordSpellingResultsList, setChordSpellingResultsList] = createSignal<Result[] | undefined>();
@@ -41,7 +41,7 @@ const GraderSidebar = () => {
         return Math.ceil((spellingPoints ?? 0) + (voiceLeadingPoints ?? 0));
     });
 
-    const chordArr = createMemo(() => useChords()[0]);
+    const chordArr = createMemo(() => useChords()![0]);
 
     const resetGrading = () => {
         const vc = voiceLead();
