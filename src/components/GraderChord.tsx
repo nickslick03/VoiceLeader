@@ -1,5 +1,5 @@
 import {  For, Show, createMemo, createSignal } from "solid-js";
-import { Result } from "../util/types";
+import { Feedback, Result } from "../util/types";
 import GraderMessage from "./GraderMessage";
 
 const GraderChord = (props: {
@@ -16,9 +16,9 @@ const GraderChord = (props: {
         ? 
         {
             message: 'Everything\'s correct!',
-            points: 0,
+            pointsLost: 0,
             isCorrect: true
-        }
+        }  as Feedback
         : props.result.feedbacks?.[shortMessageIndex() as number]);
 
     return (

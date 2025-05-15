@@ -63,7 +63,7 @@ export type Feedback = {
     isCorrect: boolean;
     message: string;
     list?: string[];
-    criterion: Criterion
+    criterion?: Criterion
 }
 
 /** References a criterion on the AP music theory grading scoring guidelines 2021:
