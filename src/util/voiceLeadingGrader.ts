@@ -597,7 +597,7 @@ export function getVoiceLeadingReports(
             'findOverlappingVoices': findOverlappingVoices(chordIndices[i - 1], chordIndices[i]),
             'findIncorrectApproachToChordalSeventh': findIncorrectApproachToChordalSeventh(chordIndices[i - 1], chordIndices[i], chordIntervals[i], chords[i], isKeyMajor),
             'findUncharacteristicLeaps': findUncharacteristicLeaps(chordIndices[i - 1], scaleDegrees[i - 1], chordIndices[i], scaleDegrees[i]),
-            'findUnresolvedChordalSeventh': findUnresolvedChordalSeventh(scaleDegrees[i - 1], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]]),
+            'findUnresolvedChordalSeventh': findUnresolvedChordalSeventh(scaleDegrees[i - 1], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]], isKeyMajor),
             'findUnresolvedOuterLeadingTone': findUnresolvedOuterLeadingTone(chordIntervals[i - 1], chordIndices[i - 1], scaleDegrees[i - 1], chordIndices[i], scaleDegrees[i], [i === 1 ? null : chords[i - 2], chords[i - 1], chords[i]]),
         })
         .filter(([, v]) => v !== null)
