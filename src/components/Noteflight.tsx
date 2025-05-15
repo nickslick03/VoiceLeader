@@ -85,8 +85,6 @@ const Noteflight = (props: {
         
         props.setScoreView(scoreView);
 
-        document.addEventListener('keyup', () => console.log('key'))
-
         scoreView.addEventListener('scoreDataLoaded', async () => {
 
             const initalScoreData = await new Promise((res: (value: ScoreData) => void) => 

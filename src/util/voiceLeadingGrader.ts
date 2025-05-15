@@ -136,9 +136,10 @@ export function findLeaps(chord1Letters: string[], chord2Letters: string[]) {
             result.push(i);
     return result;
 }
+
 /**
  *
- * @param scaleDegrees1 The scale degress of chord 1
+ * @param scaleDegrees1 The scale degrees of chord 1
  * @param chordIndices1 The MIDI indicies of chord 1
  * @param scaleDegrees2 The scale degrees of chord 2
  * @param chordIndices2 The MIDI indicies of chord 2
@@ -146,8 +147,12 @@ export function findLeaps(chord1Letters: string[], chord2Letters: string[]) {
 export function findLeaps2(scaleDegrees1: number[], chordIndices1: number[], scaleDegrees2: number[], chordIndices2: number[]) {
     const result: number[] = [];
     for (let i = 1; i <= 3; i++) {
-        const isOctaveOrMore = Math.abs(chordIndices1[i] - chordIndices2[i]) >= 12;
+        const isLeap = Math.abs(scaleDegrees1[i] - scaleDegrees2[i]) % 6 > 1 // more than 1 scale degree apart
+            || Math.abs(chordIndices1[i] - chordIndices2[i]) > 3; // more than a distance of a augmented second apart (just in case the scale degrees are close but is in a different octave)
+        if (isLeap)
+            result.push(i);
     }
+    return result;
 }
 
 /**
@@ -557,6 +562,8 @@ export function getVoiceLeadingReports(
 
     const results: Result[] = [1,2,3,4,5,6].map(i => {
 
+        console.log(findLeaps2(scaleDegrees[i - 1], chordIndices[i - 1], scaleDegrees[i], chordIndices[i]).length);
+
         if (!correctChordRealizations[i - 1] || !correctChordRealizations[i]) {
             const both = !correctChordRealizations[i - 1] && !correctChordRealizations[i];
             return {
@@ -574,7 +581,8 @@ export function getVoiceLeadingReports(
             };
         }
 
-        leaps += findLeaps(chordLetters[i - 1], chordLetters[i]).length;
+        //leaps += findLeaps(chordLetters[i - 1], chordLetters[i]).length;
+        leaps += findLeaps2(scaleDegrees[i - 1], chordIndices[i - 1], scaleDegrees[i], chordIndices[i]).length;
 
         let points = 2;
 

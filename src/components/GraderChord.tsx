@@ -29,7 +29,7 @@ const GraderChord = (props: {
                 {props.title}
             </span>
             <span class="font-bold float-right">
-                + {props.result.points ?? 0} point{props.result.points === 1 ? '' : 's'}
+                {props.result.points >= 0 ? '+' : '-'} {Math.abs(props.result.points) ?? 0} point{props.result.points === 1 ? '' : 's'}
             </span>    
             <ul class="mt-2 flex flex-col gap-1">
                 <Show when={isExpanded()} fallback={

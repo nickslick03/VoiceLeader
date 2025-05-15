@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { findLeaps, getInterval, findUncharacteristicUnequalFifths, isNotHiddenFifth, isNotHiddenOctave, findIncorrectApproachToChordalSeventh, findParallelFifths, findParallelOctaves, findParallelUnisons, findOverlappingVoices, findUncharacteristicLeaps, findUnresolvedChordalSeventh, findUnresolvedOuterLeadingTone } from "../util/voiceLeadingGrader";
+import { findLeaps, getInterval, findUncharacteristicUnequalFifths, isNotHiddenFifth, isNotHiddenOctave, findIncorrectApproachToChordalSeventh, findParallelFifths, findParallelOctaves, findParallelUnisons, findOverlappingVoices, findUncharacteristicLeaps, findUnresolvedChordalSeventh, findUnresolvedOuterLeadingTone, findLeaps2 } from "../util/voiceLeadingGrader";
 import { noteToMidiIndex } from "../util/converters";
 import { majorIntervals, VOICE_PARTS } from "../util/consts";
 import { Chord } from "../util/types";
@@ -17,6 +17,31 @@ test('findLeaps', () => {
         ['A', 'C', 'E', 'A'],
         ['G', 'B', 'D', 'G']
     )).toEqual([]);
+});
+
+test('findLeaps2', () => {
+
+    expect(findLeaps2(
+        [1, 5, 3, 1],
+        [M('C3'), M('G3'), M('E4'), M('C5')],
+        [5, 2, 2, 7] ,
+        [M('G3'), M('D4'), M('D4'), M('B4')]))
+    .toEqual([1]);
+
+    expect(findLeaps2(
+        [6, 1, 3, 6],
+        [M('A3'), M('C4'), M('E4'), M('A4')],
+        [5, 7, 2, 5],
+        [M('G3'), M('B3'), M('D4'), M('G4')]
+    )).toEqual([]);
+
+    expect(findLeaps2(
+        [6, 1, 3, 6],
+        [M('A3'), M('C4'), M('E4'), M('A4')],
+        [5, 7, 2, 5],
+        [M('G4'), M('B5'), M('D5'), M('G5')]
+    )).toEqual([1, 2, 3]);
+
 });
 
 test('getInterval', () => {
