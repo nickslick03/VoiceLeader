@@ -419,7 +419,8 @@ test('findUnresolvedChordalSeventh', () => {
         findUnresolvedChordalSeventh(
             [5, 4, 5, 7],
             [1, 3, 5, 1],
-            [null, domSeventh, tonMaj]
+            [null, domSeventh, tonMaj],
+            true
         )?.message
     ).toEqual('Chordal seventh in the tenor part is resolved correctly');
 
@@ -427,7 +428,8 @@ test('findUnresolvedChordalSeventh', () => {
         findUnresolvedChordalSeventh(
             [5, 4, 5, 7],
             [1, 5, 3, 1],
-            [null, domSeventh, tonMaj]
+            [null, domSeventh, tonMaj],
+            true
         )?.message
     ).toEqual('Chordal seventh in the tenor part is not resolved correctly');
 
@@ -435,7 +437,8 @@ test('findUnresolvedChordalSeventh', () => {
         findUnresolvedChordalSeventh(
             [2, 5, 4, 7],
             [3, 5, 5, 1],
-            [tonMin, domSecondInversionSeventh, tonFirstInversionMin]
+            [tonMin, domSecondInversionSeventh, tonFirstInversionMin],
+            true
         )?.message
     ).toEqual('Chordal seventh in the alto part is resolved correctly');
 });

@@ -1,5 +1,5 @@
 import { C_SCALE, INTERVALS, NOTE_LETTERS, VOICE_PARTS } from "./consts";
-import { noteToMidiIndex, realizeChord, scaleDegreeToInterval } from "./converters";
+import { noteToMidiIndex, realizeChord, scaleDegreeToInterval, secondaryNumeralToNumeral } from "./converters";
 import { feedbackTransformers } from "./feedbackTransformers";
 import { Chord, Feedback, Result, Interval, Outline, VoiceLead, MIDIPitch } from "./types";
 
@@ -402,7 +402,8 @@ export function findUncharacteristicLeaps(
 export function findUnresolvedChordalSeventh(
     scaleDegrees1: number[], 
     scaleDegrees2: number[],
-    chords: [Chord | null, Chord, Chord]): Feedback | null {
+    chords: [Chord | null, Chord, Chord],
+    isKeyMajor: boolean): Feedback | null {
     
     // is there a chordal seventh?
     if (!chords[1].isSeventh) {
@@ -415,7 +416,7 @@ export function findUnresolvedChordalSeventh(
         number: [3]
     };
 
-    const chordalSeventhDegree = (chords[1].numeral - 1) || 7;
+    const chordalSeventhDegree = (secondaryNumeralToNumeral(chords[1].numeral, chords[1].secondary) - 1) || 7;
     // find out the chordal seventh
     const chordalSeventhIndex = scaleDegrees1.findIndex((degree) => degree === chordalSeventhDegree);
 
