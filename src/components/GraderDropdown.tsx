@@ -28,7 +28,8 @@ const GraderDropdown = (props: {
                     {(result, i) =>
                     <GraderChord
                         title={result.title ?? `Chord ${i() + 1}`}
-                        result={result} />
+                        result={result}
+                        />
                     }
                 </For>    
             </Show>

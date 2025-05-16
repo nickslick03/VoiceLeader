@@ -1,6 +1,7 @@
 import {  For, Show, createMemo, createSignal } from "solid-js";
 import { Feedback, Result } from "../util/types";
 import GraderMessage from "./GraderMessage";
+import ChordDisplay from "./ChordDisplay";
 
 const GraderChord = (props: {
     result: Result;
@@ -25,9 +26,16 @@ const GraderChord = (props: {
         <div class={`${shortMessageIndex() === -1 ? 'bg-green-500' : 'bg-red-500'} bg-opacity-40
         border-black border-b-[1px] last:border-b-0
         py-2 px-2`}>
-            <span>
+            <div class="flex gap-2">
                 {props.title}
-            </span>
+                <div class="inline-flex gap-1">
+                    <For each={props.result.chords}>{chord =>
+                        <div class="px-1 font-semibold bg-gray-500 bg-opacity-40 rounded-sm">
+                            <ChordDisplay chord={chord}/>
+                        </div>
+                    }</For>    
+                </div>                
+            </div>
             <span class="font-bold float-right">
                 {props.result.points >= 0 ? '+' : '-'} {Math.abs(props.result.points) ?? 0} point{props.result.points === 1 ? '' : 's'}
             </span>    

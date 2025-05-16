@@ -15,7 +15,6 @@ const GraderSidebar = () => {
 
     const [voiceLead, setVoicelead] = createSignal<VoiceLead>();
 
-
     const resetVoicelead = () => {
         scoreview()
         ?.getScore()

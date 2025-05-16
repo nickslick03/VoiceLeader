@@ -299,7 +299,8 @@ function getChordSpellingResult(
 
     return {
         feedbacks: messages,
-        points: points < 0 ? 0 : points
+        points: points < 0 ? 0 : points,
+        chords: [chord]
     };
 }
 

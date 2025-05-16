@@ -633,6 +633,7 @@ export function getVoiceLeadingReports(
             title: `Chord ${i} → ${i + 1}`,
             feedbacks,
             points: Math.max(points, 0),
+            chords: [chords[i - 1], chords[i]],
         };
     });
 

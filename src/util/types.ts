@@ -63,7 +63,7 @@ export type Feedback = {
     isCorrect: boolean;
     message: string;
     list?: string[];
-    criterion?: Criterion
+    criterion?: Criterion;
 }
 
 /** References a criterion on the AP music theory grading scoring guidelines 2021:
@@ -80,6 +80,7 @@ export type Result = {
     title?: string;
     feedbacks: Feedback[];
     points: number;
+    chords?: Chord[];
 }
 
 /** A number from 0 to 11 representing a note's number of half steps above the tonic. */
