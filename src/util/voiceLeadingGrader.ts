@@ -143,6 +143,7 @@ export function findLeaps(chord1Letters: string[], chord2Letters: string[]) {
  * @param chordIndices1 The MIDI indicies of chord 1
  * @param scaleDegrees2 The scale degrees of chord 2
  * @param chordIndices2 The MIDI indicies of chord 2
+  * @returns array of indices representing the voices in which movement by leap (or skip) is made in the upper voices. 1 is tenor, 2 is alto, and 3 is soprano. Empty if there are no movements by leap (or skip).
  */
 export function findLeaps2(scaleDegrees1: number[], chordIndices1: number[], scaleDegrees2: number[], chordIndices2: number[]) {
     const result: number[] = [];
@@ -553,7 +554,7 @@ export function getVoiceLeadingReports(
     
     let totalPoints = 0;
 
-    let leaps = 0;
+    const leaps: number[][] = Array(6).fill([]);
 
     const chordIntervals = flip2DArray(userChords.map(userChord => 
         userChord.map(({scaleDegree}) => scaleDegreeToInterval(scaleDegree, isKeyMajor))));
@@ -563,7 +564,9 @@ export function getVoiceLeadingReports(
 
     const results: Result[] = [1,2,3,4,5,6].map(i => {
 
-        console.log(findLeaps2(scaleDegrees[i - 1], chordIndices[i - 1], scaleDegrees[i], chordIndices[i]).length);
+        
+        //leaps += findLeaps(chordLetters[i - 1], chordLetters[i]).length;
+        leaps[i - 1] = findLeaps2(scaleDegrees[i - 1], chordIndices[i - 1], scaleDegrees[i], chordIndices[i]);
 
         if (!correctChordRealizations[i - 1] || !correctChordRealizations[i]) {
             const both = !correctChordRealizations[i - 1] && !correctChordRealizations[i];
@@ -581,9 +584,6 @@ export function getVoiceLeadingReports(
                 }],
             };
         }
-
-        //leaps += findLeaps(chordLetters[i - 1], chordLetters[i]).length;
-        leaps += findLeaps2(scaleDegrees[i - 1], chordIndices[i - 1], scaleDegrees[i], chordIndices[i]).length;
 
         let points = 2;
 
@@ -637,7 +637,11 @@ export function getVoiceLeadingReports(
         };
     });
 
-    const leapingPointsLost = totalPoints < 12 || leaps <= 5
+    const totalLeaps = leaps.reduce((a, c) => a + c.length, 0);
+
+    console.log(leaps)
+
+    const leapingPointsLost = totalPoints < 12 || totalLeaps <= 5
             ? 0
             : 1;
             
@@ -647,15 +651,22 @@ export function getVoiceLeadingReports(
         title: 'Number of Leaps',
         points: -leapingPointsLost,
         feedbacks: [{
-            isCorrect: leaps <= 5,
-            message: `${leaps <= 5 ? 'Less' : 'More'} than 5 leaps in the upper voices`,
+            isCorrect: totalLeaps <= 5,
+            message: `${totalLeaps <= 5 ? 'Less' : 'More'} than 5 leaps in the upper voices`,
             pointsLost: leapingPointsLost,
             criterion: {
                 numeral: 'II',
                 letter: 'B',
-                number: [leaps <= 5 ? 1 : 2]
+                number: [totalLeaps <= 5 ? 1 : 2]
             }
-        }],
+        }, 
+        ...leaps
+            .filter(leapArr => leapArr.length > 0)
+            .map((leapArr, i) => ({
+            pointsLost: 0,
+            isCorrect: totalLeaps <= 5,
+            message: `Chord ${i + 1} → ${i + 2}: leaps in ${leapArr.map(p => VOICE_PARTS[p]).join(', ')}`
+        }))],
     };
 
     results.unshift(leapsResult);
