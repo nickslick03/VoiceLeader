@@ -45,7 +45,6 @@ const GraderSidebar = () => {
     const resetGrading = () => {
         const vc = voiceLead();
         if (vc !== undefined) {
-            console.log(vc)
             const spellingResults = setChordSpellingResultsList(
                 getChordSpellingResults(vc, chordArr())
             );

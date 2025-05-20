@@ -639,8 +639,6 @@ export function getVoiceLeadingReports(
 
     const totalLeaps = leaps.reduce((a, c) => a + c.length, 0);
 
-    console.log(leaps)
-
     const leapingPointsLost = totalPoints < 12 || totalLeaps <= 5
             ? 0
             : 1;
