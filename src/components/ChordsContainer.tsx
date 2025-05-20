@@ -19,12 +19,12 @@ const ChordsContainer = () => {
         <>
             <div class="flex justify-center gap-2 flex-wrap">
                 <For each={Array(2)}>{(_, measureIndex) =>
-                    <div class="bg-gray-400 p-2">
+                    <div class="p-2">
                         <div class="flex justify-center gap-2">
                             <For each={Array(measureIndex() === 0 ? 4 : 3)}>
                                 {(i, quarterNoteIndex) =>
                                 <div 
-                                    class="bg-white p-2"
+                                    class="bg-white p-2 shadow-sm shadow-[rgba(0,0,0,.4)] select-none cursor-pointer"
                                     onClick={() => showModal((measureIndex() * 4) + quarterNoteIndex())}>
                                     <ChordDisplay chord={chordArr()[(measureIndex() * 4) + quarterNoteIndex()]} />
                                 </div>}
