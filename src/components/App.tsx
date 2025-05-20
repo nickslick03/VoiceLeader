@@ -7,7 +7,7 @@ import PresetChords from './PresetChords';
 const App = () => {
 
   return (
-    <>
+    <div class='flex flex-col min-h-screen'>
       <hgroup class="text-center my-8 flex flex-col items-center gap-4">
         <h1 class="text-4xl font-bold pb-4 border-b-2">
           Voice Leader
@@ -20,7 +20,12 @@ const App = () => {
       <InputContainer />
       <GraderSidebar />
       <PresetChords />
-    </>
+      <footer class='flex-1 flex items-end justify-center gap-4 [&>a]:text-indigo-800 [&>a]:underline py-2'>
+        <a href='https://apcentral.collegeboard.org/media/pdf/ap24-sg-music-theory.pdf'>AP Scoring Guidelines</a>
+        <a href='https://github.com/nickslick03/VoiceLeader'>Source Code</a>
+        <a href='https://www.linkedin.com/in/nicholas-epps-597b94295/'>Nicholas Epps</a>
+      </footer>
+    </div>
   );
 };
 
