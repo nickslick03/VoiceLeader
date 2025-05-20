@@ -2,6 +2,7 @@ import Noteflight from './Noteflight';
 import InputContainer from './InputContainer';
 import GraderSidebar from './GraderSidebar';
 import { useScoreview } from './ScoreviewProvider';
+import PresetChords from './PresetChords';
 
 const App = () => {
 
@@ -18,6 +19,7 @@ const App = () => {
       <Noteflight setScoreView={useScoreview()[1]}/>
       <InputContainer />
       <GraderSidebar />
+      <PresetChords />
     </>
   );
 };
