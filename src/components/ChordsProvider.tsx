@@ -7,12 +7,12 @@ import { CHORD_QUALITIES, LOCAL_STORAGE_KEYS } from "../util/consts";
 const ChordContext = createContext<[get: Chord[], set: SetStoreFunction<Chord[]>]>();
 
 const chordTypeChecker = {
-  numeral: (n: unknown) => typeof n === 'number' && !isNaN(n) && n >= 1 && n <= 7,
-  quality: (q: unknown) => typeof q === 'string' && CHORD_QUALITIES.includes(q),
-  isSeventh: (is: unknown) => typeof is === 'boolean',
-  inversion: (i: unknown) => typeof i === 'number' && i >= 0 && i <= 2,
-  secondary: function (s: unknown) { return this.numeral(s) },
-  secondaryQuality: function (sq: unknown) { return this.quality(sq) }
+  numeral: ({numeral}: Chord) => typeof numeral === 'number' && !isNaN(numeral) && numeral >= 1 && numeral <= 7,
+  quality: ({quality}: Chord) => typeof quality === 'string' && CHORD_QUALITIES.includes(quality),
+  isSeventh: ({isSeventh}: Chord) => typeof isSeventh === 'boolean',
+  inversion: ({inversion, isSeventh}: Chord) => typeof inversion === 'number' && inversion >= 0 && (inversion <= 2 || (isSeventh && inversion <= 3)),
+  secondary: function ({secondary}: Chord) { return this.numeral({numeral: secondary} as Chord) },
+  secondaryQuality: function ({secondaryQuality}: Chord) { return this.quality({quality: secondaryQuality} as Chord) }
 };
 
 export function ChordsProvider(props: {
@@ -39,7 +39,7 @@ export function ChordsProvider(props: {
     let isChordStorageValid = true;
     for (let i = 0; i < chordStorage.length; i++) {
       for (let [k, v] of Object.entries(chordStorage[i])) {
-        if (!chordTypeChecker[k as keyof Chord](v)) {
+        if (!chordTypeChecker[k as keyof Chord](chordStorage[i])) {
           console.error(chordStorage, `'${k}: ${v}' is not a valid chord property in chord ${i + 1} in the chords array in local storage. Reverting to default chords.`);
           isChordStorageValid = false;
         }
