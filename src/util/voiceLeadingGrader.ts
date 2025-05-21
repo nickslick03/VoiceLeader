@@ -431,11 +431,16 @@ export function findUnresolvedChordalSeventh(
     }
 
     const movement = scaleDegrees1[chordalSeventhIndex] - scaleDegrees2[chordalSeventhIndex];
-    if (movement === 1 || movement === 0 || movement == 6 /* 7 to 1 */ || (
-        chords[0] !== null 
+
+    console.log(movement);
+
+    const execptionProgression = chords[0] !== null 
         && chords[0].numeral === 1 && chords[0].quality === 'minor' && chords[0].inversion === 0 // i
         && chords[1].numeral === 5 && chords[1].quality === 'majorMinor' && chords[1].inversion === 2 // V4/3
-        && chords[2].numeral === 1 && chords[2].quality === 'minor' && chords[2].inversion === 1 // i6
+        && chords[2].numeral === 1 && chords[2].quality === 'minor' && chords[2].inversion === 1; // i6
+
+    if (movement === 1 || movement === 0  || movement === -6 /* 1 to 7 */ || (
+        (movement === -1 || movement === 6) && execptionProgression
     )) {
         return {
             criterion,
@@ -568,7 +573,7 @@ export function getVoiceLeadingReports(
         //leaps += findLeaps(chordLetters[i - 1], chordLetters[i]).length;
         leaps[i - 1] = findLeaps2(scaleDegrees[i - 1], chordIndices[i - 1], scaleDegrees[i], chordIndices[i]);
 
-        if (!correctChordRealizations[i - 1] || !correctChordRealizations[i]) {
+        if ((!correctChordRealizations[i - 1] && i - 1 != 0) || !correctChordRealizations[i]) {
             const both = !correctChordRealizations[i - 1] && !correctChordRealizations[i];
             return {
                 title: `Chord ${i} → ${i + 1}`,

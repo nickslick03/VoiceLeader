@@ -29,7 +29,7 @@ const chordSpellingOutlinesWithArrays: Record<string, Outline<'Array'>> = {
     'ommittedNotes': {
         points: 1,
         correctMessage: 'The chord spelling has no ommitted notes',
-        errorMessage: 'The chord spelling has the following scale degrees ommitted:',
+        errorMessage: 'The chord spelling has the following members ommitted:',
         array: CHORD_ORDINALS,
         criterion: {
             numeral: 'I',
