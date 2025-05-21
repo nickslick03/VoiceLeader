@@ -34,12 +34,14 @@ const GraderSidebar = () => {
     const [voiceLeadingResultsList, setVoiceLeadingResultsList] = createSignal<Result[] | undefined>();
 
     const totalPoints = createMemo(() => {
+        console.log(chordSpellingResultsList(), voiceLeadingResultsList())
         const spellingPoints = chordSpellingResultsList()?.reduce<number>((points, result, index) => 
             index === 0 
                 ? 0 
                 : result.points + points, 0);
         const voiceLeadingPoints = voiceLeadingResultsList()?.reduce<number>((points, result) => points + result.points, 0);
-        return Math.ceil((spellingPoints ?? 0) + (voiceLeadingPoints ?? 0));
+        console.log(spellingPoints, voiceLeadingPoints);
+        return Math.floor((spellingPoints ?? 0) + (voiceLeadingPoints ?? 0));
     });
 
     const chordArr = createMemo(() => useChords()![0]);
