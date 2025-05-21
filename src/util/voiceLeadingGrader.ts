@@ -621,11 +621,13 @@ export function getVoiceLeadingReports(
             } else {
                 fb = value as Feedback;
             }
-            if (!fb.isCorrect && points > 0) {
+            if (!fb.isCorrect) {
                 points -= fb.pointsLost;
             }
             return fb;
         });
+        
+        //console.log(feedbacks);
 
         totalPoints += Math.max(points, 0);
 

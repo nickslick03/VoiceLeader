@@ -35,11 +35,11 @@ const GraderChord = (props: {
                             <ChordDisplay chord={chord}/>
                         </div>
                     }</For>    
-                </div>                
-            </div>
-            <span class="font-bold float-right">
-                {props.result.points >= 0 ? '+' : '-'} {Math.abs(props.result.points) ?? 0} point{props.result.points === 1 ? '' : 's'}
-            </span>    
+                </div>
+                <span class="font-bold flex-1 flex justify-end">
+                    {props.result.points >= 0 ? '+' : '-'} {Math.abs(props.result.points) ?? 0} point{props.result.points === 1 ? '' : 's'}
+                </span>               
+            </div>   
             <ul class="mt-2 flex flex-col gap-1">
                 <Show when={isExpanded()} fallback={
                     <GraderMessage message={getShortDisplay}/>

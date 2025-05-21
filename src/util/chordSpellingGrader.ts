@@ -313,7 +313,7 @@ function getChordSpellingResult(
 export function getChordSpellingResults(
     voiceLead: VoiceLead, chords: Chord[]): Result[] {
     const isKeyMajor = voiceLead.keySignature.mode === 'major';
-    return voiceLead.bass.map((bass, i) => getChordSpellingResult(
+    const results = voiceLead.bass.map((bass, i) => getChordSpellingResult(
         [
             bass,
             voiceLead.tenor[i],
@@ -323,4 +323,6 @@ export function getChordSpellingResults(
         chords[i],
         isKeyMajor
     ));
+    results[0].points = 0;
+    return results;
 }
