@@ -1,4 +1,4 @@
-import {  For, Show, createMemo, createSignal } from "solid-js";
+import {  Accessor, For, Show, createMemo, createSignal } from "solid-js";
 import { Feedback, Result } from "../util/types";
 import GraderMessage from "./GraderMessage";
 import ChordDisplay from "./ChordDisplay";
@@ -6,6 +6,7 @@ import ChordDisplay from "./ChordDisplay";
 const GraderChord = (props: {
     result: Result;
     title: string;
+    showCitations: Accessor<boolean>
 }) => {
 
     const [isExpanded, setIsExpanded] = createSignal(false);
@@ -45,7 +46,7 @@ const GraderChord = (props: {
                 }>
                     <For each={props.result.feedbacks}>
                         {(message) =>
-                        <GraderMessage message={() => message} />}
+                        <GraderMessage message={() => message} showCitations={props.showCitations} />}
                     </For>    
                 </Show>  
             </ul>

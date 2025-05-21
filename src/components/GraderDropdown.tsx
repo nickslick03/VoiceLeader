@@ -5,6 +5,7 @@ import { Result } from "../util/types";
 const GraderDropdown = (props: {
     results: Accessor<Result[] | undefined>;
     children: JSX.Element;
+    showCitations: Accessor<boolean>;
 }) => {
 
     const [isDrop, setIsDrop] = createSignal(true);
@@ -29,6 +30,7 @@ const GraderDropdown = (props: {
                     <GraderChord
                         title={result.title ?? `Chord ${i() + 1}`}
                         result={result}
+                        showCitations={props.showCitations}
                         />
                     }
                 </For>    

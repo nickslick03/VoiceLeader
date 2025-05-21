@@ -15,6 +15,8 @@ const GraderSidebar = () => {
 
     const [voiceLead, setVoicelead] = createSignal<VoiceLead>();
 
+    const [showCitations, setShowCitations] = createSignal<boolean>(true);
+
     const resetVoicelead = () => {
         scoreview()
         ?.getScore()
@@ -80,18 +82,28 @@ const GraderSidebar = () => {
                 <h2 class="text-2xl font-bold">
                     Points: {totalPoints()} / 18
                 </h2>
-
-                    <div class="text-left flex flex-col gap-10">
-                        <GraderDropdown 
-                            results={chordSpellingResultsList}>
-                            Chord Spelling
-                        </GraderDropdown>
-                        <GraderDropdown 
-                            results={voiceLeadingResultsList}>
-                            Voice Leading
-                        </GraderDropdown>
-                    </div>
-                <div></div>
+                <div class="flex justify-center gap-2">
+                    <input 
+                        type="checkbox"
+                        id="showCitations"
+                        checked={showCitations()} 
+                        onclick={() => setShowCitations(!showCitations())} />
+                    <label for="showCitations">
+                        Show AP Scoring Citations
+                    </label>
+                </div>
+                <div class="text-left flex flex-col gap-10">
+                    <GraderDropdown 
+                        results={chordSpellingResultsList}
+                        showCitations={showCitations}>
+                        Chord Spelling
+                    </GraderDropdown>
+                    <GraderDropdown 
+                        results={voiceLeadingResultsList}
+                        showCitations={showCitations}>
+                        Voice Leading
+                    </GraderDropdown>
+                </div>
                 <div class="sticky bottom-0
                     flex justify-center gap-4 items-end">
                     <button

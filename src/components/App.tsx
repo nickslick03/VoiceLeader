@@ -21,7 +21,7 @@ const App = () => {
       <GraderSidebar />
       <PresetChords />
       <footer class='flex-1 flex items-end justify-center gap-4 [&>a]:text-indigo-800 [&>a]:underline py-2'>
-        <a href='https://apcentral.collegeboard.org/media/pdf/ap24-sg-music-theory.pdf'>AP Scoring Guidelines</a>
+        <a href='https://apcentral.collegeboard.org/media/pdf/ap24-sg-music-theory.pdf' target='_blank'>AP Scoring Guidelines</a>
         <a href='https://github.com/nickslick03/VoiceLeader'>Source Code</a>
         <a href='https://www.linkedin.com/in/nicholas-epps-597b94295/'>Nicholas Epps</a>
       </footer>
