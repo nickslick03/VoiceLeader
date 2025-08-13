@@ -19,7 +19,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/nickslick/VoiceLeader.git
+git clone https://github.com/nickslick03/VoiceLeader.git
 cd voiceleader
 
 # Install dependencies
